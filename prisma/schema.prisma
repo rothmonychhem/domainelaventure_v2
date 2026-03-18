@@ -1,0 +1,42 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Cabin {
+  id          String   @id @default(cuid())
+  name        String
+  slug        String   @unique
+  description String
+  price       String
+  guests      Int
+  bedrooms    Int
+  bathrooms   Int
+  featured    Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  images      CabinImage[]
+}
+
+model CabinImage {
+  id       String @id @default(cuid())
+  url      String
+  position Int
+  cabinId  String
+  cabin    Cabin  @relation(fields: [cabinId], references: [id], onDelete: Cascade)
+}
+
+model Reservation {
+  id          String   @id @default(cuid())
+  name        String
+  email       String
+  phone       String
+  chalet      String
+  startDate   String
+  endDate     String
+  comments    String
+  createdAt   DateTime @default(now())
+}
