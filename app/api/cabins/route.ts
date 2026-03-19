@@ -5,7 +5,9 @@ import { getSession } from "@/lib/auth";
 export async function POST(req: Request) {
   const session = await getSession();
   if (!session) {
-    return NextResponse.redirect(new URL("/login", req.url));
+    return NextResponse.redirect(new URL("/login", req.url), {
+      status: 303,
+    });
   }
 
   const formData = await req.formData();
@@ -42,5 +44,7 @@ export async function POST(req: Request) {
     },
   });
 
-  return NextResponse.redirect(new URL("/admin", req.url));
+  return NextResponse.redirect(new URL("/admin", req.url), {
+    status: 303,
+  });
 }

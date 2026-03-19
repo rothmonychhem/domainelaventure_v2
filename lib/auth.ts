@@ -4,7 +4,17 @@ import { cookies } from "next/headers";
 type Role = "owner" | "dev";
 
 function getSecret() {
-  return process.env.SESSION_SECRET || "dev-secret";
+  const secret = process.env.SESSION_SECRET;
+
+  if (secret) {
+    return secret;
+  }
+
+  if (process.env.NODE_ENV !== "production") {
+    return "dev-secret";
+  }
+
+  throw new Error("SESSION_SECRET must be set in production.");
 }
 
 export function signSession(payload: { email: string; role: Role }) {

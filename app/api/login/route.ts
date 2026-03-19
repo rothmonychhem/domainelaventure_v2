@@ -17,15 +17,20 @@ export async function POST(req: Request) {
   if (email === devEmail && password === devPassword) role = "dev";
 
   if (!role) {
-    return NextResponse.redirect(new URL("/login", req.url));
+    return NextResponse.redirect(new URL("/login?error=1", req.url), {
+      status: 303,
+    });
   }
 
   const token = signSession({ email, role });
-  const res = NextResponse.redirect(new URL("/admin", req.url));
+  const res = NextResponse.redirect(new URL("/admin", req.url), {
+    status: 303,
+  });
   res.cookies.set("session", token, {
     httpOnly: true,
     sameSite: "lax",
     path: "/",
+    secure: process.env.NODE_ENV === "production",
   });
 
   return res;

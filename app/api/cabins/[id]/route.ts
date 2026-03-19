@@ -8,7 +8,9 @@ export async function POST(
 ) {
   const session = await getSession();
   if (!session) {
-    return NextResponse.redirect(new URL("/login", req.url));
+    return NextResponse.redirect(new URL("/login", req.url), {
+      status: 303,
+    });
   }
 
   const { id } = await params;
@@ -53,5 +55,7 @@ export async function POST(
     })),
   });
 
-  return NextResponse.redirect(new URL("/admin", req.url));
+  return NextResponse.redirect(new URL("/admin", req.url), {
+    status: 303,
+  });
 }
