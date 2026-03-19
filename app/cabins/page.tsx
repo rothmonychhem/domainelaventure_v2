@@ -3,6 +3,8 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { getAllCabins } from "@/lib/cabins";
 
+export const dynamic = "force-dynamic";
+
 export default async function CabinsPage() {
   const cabins = await getAllCabins();
 

@@ -5,9 +5,13 @@ const globalForPrisma = globalThis as unknown as {
   prisma: ReturnType<typeof createPrismaClient> | undefined;
 };
 
+function getAccelerateUrl() {
+  return process.env.DATABASE_URL || "prisma://localhost?api_key=local-build";
+}
+
 function createPrismaClient() {
   return new PrismaClient({
-    accelerateUrl: process.env.DATABASE_URL,
+    accelerateUrl: getAccelerateUrl(),
     log: ["error"],
   }).$extends(withAccelerate());
 }

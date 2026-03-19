@@ -11,33 +11,73 @@ export type CabinWithImages = Prisma.CabinGetPayload<{
   include: typeof cabinInclude;
 }>;
 
-export async function getAllCabins(): Promise<CabinWithImages[]> {
-  const cabins = await prisma.cabin.findMany({
-    include: cabinInclude,
-    orderBy: { createdAt: "desc" },
-  });
+function isDatabaseUnavailable(error: unknown) {
+  if (!(error instanceof Error)) {
+    return false;
+  }
 
-  return cabins as CabinWithImages[];
+  const message = error.message.toLowerCase();
+
+  return (
+    message.includes("fetch failed") ||
+    message.includes("econnrefused") ||
+    message.includes("can't reach database server") ||
+    message.includes("invalid datasource") ||
+    message.includes("accelerate")
+  );
+}
+
+export async function getAllCabins(): Promise<CabinWithImages[]> {
+  try {
+    const cabins = await prisma.cabin.findMany({
+      include: cabinInclude,
+      orderBy: { createdAt: "desc" },
+    });
+
+    return cabins as CabinWithImages[];
+  } catch (error) {
+    if (isDatabaseUnavailable(error)) {
+      return [];
+    }
+
+    throw error;
+  }
 }
 
 export async function getCabinBySlug(
   slug: string
 ): Promise<CabinWithImages | null> {
-  const cabin = await prisma.cabin.findUnique({
-    where: { slug },
-    include: cabinInclude,
-  });
+  try {
+    const cabin = await prisma.cabin.findUnique({
+      where: { slug },
+      include: cabinInclude,
+    });
 
-  return cabin as CabinWithImages | null;
+    return cabin as CabinWithImages | null;
+  } catch (error) {
+    if (isDatabaseUnavailable(error)) {
+      return null;
+    }
+
+    throw error;
+  }
 }
 
 export async function getCabinById(
   id: string
 ): Promise<CabinWithImages | null> {
-  const cabin = await prisma.cabin.findUnique({
-    where: { id },
-    include: cabinInclude,
-  });
+  try {
+    const cabin = await prisma.cabin.findUnique({
+      where: { id },
+      include: cabinInclude,
+    });
 
-  return cabin as CabinWithImages | null;
+    return cabin as CabinWithImages | null;
+  } catch (error) {
+    if (isDatabaseUnavailable(error)) {
+      return null;
+    }
+
+    throw error;
+  }
 }

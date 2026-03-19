@@ -3,6 +3,8 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { getAllCabins } from "@/lib/cabins";
 
+export const dynamic = "force-dynamic";
+
 const highlights = [
   "Direct reservation requests with no marketplace fees",
   "Owner/dev login hidden in the footer for lightweight management",

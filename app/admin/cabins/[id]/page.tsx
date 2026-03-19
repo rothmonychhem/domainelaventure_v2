@@ -2,6 +2,8 @@ import { redirect } from "next/navigation";
 import { getSession } from "@/lib/auth";
 import { getCabinById } from "@/lib/cabins";
 
+export const dynamic = "force-dynamic";
+
 export default async function EditCabinPage({
   params,
 }: {

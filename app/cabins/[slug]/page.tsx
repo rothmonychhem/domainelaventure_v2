@@ -4,6 +4,8 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { getCabinBySlug } from "@/lib/cabins";
 
+export const dynamic = "force-dynamic";
+
 export default async function CabinDetailPage({
   params,
 }: {
