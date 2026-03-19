@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import { getSession } from "@/lib/auth";
 import { getCabinById } from "@/lib/cabins";
+import CabinEditorForm from "@/components/CabinEditorForm";
 
 export const dynamic = "force-dynamic";
 
@@ -21,39 +22,42 @@ export default async function EditCabinPage({
 
   return (
     <main className="min-h-screen bg-[#f6efe5] px-6 py-10">
-      <div className="mx-auto max-w-3xl rounded-[2rem] border border-[var(--line)] bg-white/82 p-8 shadow-[0_24px_60px_rgba(74,47,27,0.08)]">
+      <div className="mx-auto max-w-4xl rounded-[2rem] border border-[var(--line)] bg-white/82 p-8 shadow-[0_24px_60px_rgba(74,47,27,0.08)]">
         <p className="eyebrow">Admin</p>
         <h1 className="font-heading mt-3 text-4xl font-semibold text-[var(--accent-dark)]">
           Edit cabin
         </h1>
-
-        <form action={`/api/cabins/${cabin.id}`} method="POST" className="mt-8 space-y-5">
-          <input name="name" required defaultValue={cabin.name} className="w-full rounded-[1.2rem] border border-[var(--line)] bg-white px-4 py-3" />
-          <input name="slug" required defaultValue={cabin.slug} className="w-full rounded-[1.2rem] border border-[var(--line)] bg-white px-4 py-3" />
-          <textarea name="description" required rows={5} defaultValue={cabin.description} className="w-full rounded-[1.2rem] border border-[var(--line)] bg-white px-4 py-3" />
-          <input name="price" required defaultValue={cabin.price} className="w-full rounded-[1.2rem] border border-[var(--line)] bg-white px-4 py-3" />
-          <div className="grid gap-5 md:grid-cols-3">
-            <input name="guests" required type="number" defaultValue={cabin.guests} className="w-full rounded-[1.2rem] border border-[var(--line)] bg-white px-4 py-3" />
-            <input name="bedrooms" required type="number" defaultValue={cabin.bedrooms} className="w-full rounded-[1.2rem] border border-[var(--line)] bg-white px-4 py-3" />
-            <input name="bathrooms" required type="number" defaultValue={cabin.bathrooms} className="w-full rounded-[1.2rem] border border-[var(--line)] bg-white px-4 py-3" />
-          </div>
-
-          <div>
-            <label className="mb-2 block text-sm font-semibold text-stone-700">
-              Gallery image URLs in order, one per line
-            </label>
-            <textarea
-              name="images"
-              rows={8}
-              defaultValue={cabin.images.map((img) => img.url).join("\n")}
-              className="w-full rounded-[1.2rem] border border-[var(--line)] bg-white px-4 py-3"
-            />
-          </div>
-
-          <button className="rounded-full bg-[var(--accent-dark)] px-6 py-3 font-semibold text-white transition hover:bg-[var(--accent)]">
-            Save changes
-          </button>
-        </form>
+        <CabinEditorForm
+          action={`/api/cabins/${cabin.id}`}
+          submitLabel="Save changes"
+          initialValues={{
+            name: cabin.name,
+            slug: cabin.slug,
+            description: cabin.description,
+            price: cabin.price,
+            guests: cabin.guests,
+            bedrooms: cabin.bedrooms,
+            bathrooms: cabin.bathrooms,
+            wifi: cabin.wifi,
+            hotTub: cabin.hotTub,
+            lakeAccess: cabin.lakeAccess,
+            fireplace: cabin.fireplace,
+            bbq: cabin.bbq,
+            airConditioning: cabin.airConditioning,
+            fullKitchen: cabin.fullKitchen,
+            washerDryer: cabin.washerDryer,
+            workspace: cabin.workspace,
+            petFriendly: cabin.petFriendly,
+            selfCheckIn: cabin.selfCheckIn,
+            freeParking: cabin.freeParking,
+          }}
+          initialMedia={cabin.images.map((image) => ({
+            id: image.id,
+            url: image.url,
+            mediaType: image.mediaType,
+            isHero: image.isHero,
+          }))}
+        />
       </div>
     </main>
   );

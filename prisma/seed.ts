@@ -15,6 +15,18 @@ async function main() {
       guests: 4,
       bedrooms: 2,
       bathrooms: 1,
+      wifi: true,
+      hotTub: true,
+      lakeAccess: true,
+      fireplace: true,
+      bbq: true,
+      airConditioning: false,
+      fullKitchen: true,
+      washerDryer: true,
+      workspace: true,
+      petFriendly: true,
+      selfCheckIn: true,
+      freeParking: true,
       images: {
         create: [
           {

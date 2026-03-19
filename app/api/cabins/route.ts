@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getSession } from "@/lib/auth";
+import { getAmenitiesFromFormData } from "@/lib/amenities";
+import { parseMediaState, saveUploadedMedia } from "@/lib/cabin-media";
 
 export async function POST(req: Request) {
   const session = await getSession();
@@ -19,12 +21,15 @@ export async function POST(req: Request) {
   const guests = Number(formData.get("guests") || 0);
   const bedrooms = Number(formData.get("bedrooms") || 0);
   const bathrooms = Number(formData.get("bathrooms") || 0);
-  const imagesRaw = String(formData.get("images") || "");
+  const amenities = getAmenitiesFromFormData(formData);
+  const mediaState = parseMediaState(formData);
+  const uploadedFiles = formData
+    .getAll("mediaFiles")
+    .filter((entry): entry is File => entry instanceof File);
 
-  const images = imagesRaw
-    .split("\n")
-    .map((s) => s.trim())
-    .filter(Boolean);
+  const uploadedMedia = await Promise.all(
+    uploadedFiles.map((file) => saveUploadedMedia(file))
+  );
 
   await prisma.cabin.create({
     data: {
@@ -35,11 +40,25 @@ export async function POST(req: Request) {
       guests,
       bedrooms,
       bathrooms,
+      ...amenities,
       images: {
-        create: images.map((url, index) => ({
-          url,
-          position: index,
-        })),
+        create: mediaState.flatMap((item, index) => {
+          if (item.kind !== "new") {
+            return [];
+          }
+
+          const uploaded = uploadedMedia[item.fileIndex];
+          if (!uploaded) {
+            return [];
+          }
+
+          return {
+            url: uploaded.url,
+            mediaType: uploaded.mediaType,
+            isHero: item.isHero && uploaded.mediaType === "image",
+            position: index,
+          };
+        }),
       },
     },
   });

@@ -15,6 +15,18 @@ model Cabin {
   guests      Int
   bedrooms    Int
   bathrooms   Int
+  wifi        Boolean  @default(false)
+  hotTub      Boolean  @default(false)
+  lakeAccess  Boolean  @default(false)
+  fireplace   Boolean  @default(false)
+  bbq         Boolean  @default(false)
+  airConditioning Boolean @default(false)
+  fullKitchen Boolean  @default(false)
+  washerDryer Boolean  @default(false)
+  workspace   Boolean  @default(false)
+  petFriendly Boolean  @default(false)
+  selfCheckIn Boolean  @default(false)
+  freeParking Boolean  @default(false)
   featured    Boolean  @default(false)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
@@ -24,6 +36,8 @@ model Cabin {
 model CabinImage {
   id       String @id @default(cuid())
   url      String
+  mediaType String @default("image")
+  isHero   Boolean @default(false)
   position Int
   cabinId  String
   cabin    Cabin  @relation(fields: [cabinId], references: [id], onDelete: Cascade)

@@ -11,6 +11,16 @@ const highlights = [
   "Cabin detail pages with galleries, amenities, and clear calls to reserve",
 ];
 
+function getCabinCardImage(
+  images: Array<{ url: string; mediaType: string; isHero: boolean }>
+) {
+  return (
+    images.find((image) => image.isHero && image.mediaType === "image")?.url ||
+    images.find((image) => image.mediaType === "image")?.url ||
+    "https://images.unsplash.com/photo-1448375240586-882707db888b?auto=format&fit=crop&w=1200&q=80"
+  );
+}
+
 export default async function HomePage() {
   const cabins = await getAllCabins();
   const featuredCabins = cabins.slice(0, 3);
@@ -119,10 +129,9 @@ export default async function HomePage() {
                   <div
                     className="h-72 bg-cover bg-center"
                     style={{
-                      backgroundImage: `linear-gradient(180deg, rgba(39, 28, 22, 0.06), rgba(39, 28, 22, 0.2)), url('${
-                        cabin.images[0]?.url ||
-                        "https://images.unsplash.com/photo-1448375240586-882707db888b?auto=format&fit=crop&w=1200&q=80"
-                      }')`,
+                      backgroundImage: `linear-gradient(180deg, rgba(39, 28, 22, 0.06), rgba(39, 28, 22, 0.2)), url('${getCabinCardImage(
+                        cabin.images
+                      )}')`,
                     }}
                   />
                   <div className="space-y-4 p-7">

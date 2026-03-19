@@ -1,0 +1,3 @@
+ALTER TABLE "CabinImage"
+ADD COLUMN "mediaType" TEXT NOT NULL DEFAULT 'image',
+ADD COLUMN "isHero" BOOLEAN NOT NULL DEFAULT false;

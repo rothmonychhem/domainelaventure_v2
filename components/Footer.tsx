@@ -16,6 +16,9 @@ export default function Footer() {
         </div>
 
         <div className="flex items-center gap-5 text-sm font-semibold">
+          <Link href="/contract" className="text-stone-300 transition hover:text-white">
+            Chalet rules
+          </Link>
           <Link href="/contact" className="text-stone-300 transition hover:text-white">
             Reservation form
           </Link>

@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { getCabinBySlug } from "@/lib/cabins";
+import { amenityOptions } from "@/lib/amenities";
 
 export const dynamic = "force-dynamic";
 
@@ -17,8 +18,10 @@ export default async function CabinDetailPage({
   if (!cabin) notFound();
 
   const heroImage =
-    cabin.images[0]?.url ||
+    cabin.images.find((image) => image.isHero && image.mediaType === "image")?.url ||
+    cabin.images.find((image) => image.mediaType === "image")?.url ||
     "https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?auto=format&fit=crop&w=1600&q=80";
+  const availableAmenities = amenityOptions.filter((amenity) => cabin[amenity.name]);
 
   return (
     <main className="shell min-h-screen">
@@ -79,20 +82,55 @@ export default async function CabinDetailPage({
               <div className="mt-6 grid gap-4 md:grid-cols-2">
                 {(cabin.images.length > 0
                   ? cabin.images
-                  : [{ id: "fallback", url: heroImage }]
+                  : [{ id: "fallback", url: heroImage, mediaType: "image" }]
                 ).map((image, index) => (
                   <div
                     key={image.id}
                     className={index === 0 ? "md:col-span-2" : undefined}
                   >
-                    <div
-                      className={`rounded-[1.5rem] bg-cover bg-center ${
-                        index === 0 ? "h-80" : "h-56"
-                      }`}
-                      style={{ backgroundImage: `url('${image.url}')` }}
-                    />
+                    {image.mediaType === "video" ? (
+                      <video
+                        src={image.url}
+                        className={`w-full rounded-[1.5rem] object-cover ${
+                          index === 0 ? "h-80" : "h-56"
+                        }`}
+                        controls
+                      />
+                    ) : (
+                      <div
+                        className={`rounded-[1.5rem] bg-cover bg-center ${
+                          index === 0 ? "h-80" : "h-56"
+                        }`}
+                        style={{ backgroundImage: `url('${image.url}')` }}
+                      />
+                    )}
                   </div>
                 ))}
+              </div>
+            </div>
+
+            <div className="panel rounded-[2rem] p-7">
+              <p className="eyebrow">What this place offers</p>
+              <div className="mt-6 grid gap-4 sm:grid-cols-2">
+                {availableAmenities.length > 0 ? (
+                  availableAmenities.map((amenity) => (
+                    <div
+                      key={amenity.name}
+                      className="soft-ring rounded-[1.4rem] bg-white/70 p-5"
+                    >
+                      <p className="text-sm font-semibold text-[var(--accent-dark)]">
+                        {amenity.label}
+                      </p>
+                      <p className="mt-2 text-sm leading-6 text-stone-600">
+                        {amenity.description}
+                      </p>
+                    </div>
+                  ))
+                ) : (
+                  <div className="soft-ring rounded-[1.4rem] bg-white/70 p-5 text-sm leading-6 text-stone-600 sm:col-span-2">
+                    Amenities have not been added for this chalet yet.
+                  </div>
+                )}
               </div>
             </div>
           </div>

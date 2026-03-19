@@ -5,6 +5,16 @@ import { getAllCabins } from "@/lib/cabins";
 
 export const dynamic = "force-dynamic";
 
+function getCabinCardImage(
+  images: Array<{ url: string; mediaType: string; isHero: boolean }>
+) {
+  return (
+    images.find((image) => image.isHero && image.mediaType === "image")?.url ||
+    images.find((image) => image.mediaType === "image")?.url ||
+    "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=1200&q=80"
+  );
+}
+
 export default async function CabinsPage() {
   const cabins = await getAllCabins();
 
@@ -36,10 +46,9 @@ export default async function CabinsPage() {
               <div
                 className="h-80 bg-cover bg-center"
                 style={{
-                  backgroundImage: `linear-gradient(180deg, rgba(27, 20, 16, 0.05), rgba(27, 20, 16, 0.22)), url('${
-                    cabin.images[0]?.url ||
-                    "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=1200&q=80"
-                  }')`,
+                  backgroundImage: `linear-gradient(180deg, rgba(27, 20, 16, 0.05), rgba(27, 20, 16, 0.22)), url('${getCabinCardImage(
+                    cabin.images
+                  )}')`,
                 }}
               />
               <div className="grid gap-6 p-7 md:grid-cols-[1fr_auto] md:items-end">
