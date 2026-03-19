@@ -10,6 +10,7 @@ async function main() {
     data: {
       name: "Forest Haven",
       slug: "forest-haven",
+      address: "123 Lakeshore Road, Sainte-Agathe-des-Monts, QC",
       description: "A warm cabin tucked into the woods with peaceful views and cozy comfort.",
       price: "$199/night",
       guests: 4,

@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { getSession } from "@/lib/auth";
 import { getAmenitiesFromFormData } from "@/lib/amenities";
 import { parseMediaState, saveUploadedMedia } from "@/lib/cabin-media";
+import { buildCabinSlug } from "@/lib/cabin-listing";
 
 export async function POST(
   req: Request,
@@ -19,7 +20,8 @@ export async function POST(
   const formData = await req.formData();
 
   const name = String(formData.get("name") || "");
-  const slug = String(formData.get("slug") || "");
+  const address = String(formData.get("address") || "");
+  const slug = buildCabinSlug({ name, address });
   const description = String(formData.get("description") || "");
   const price = String(formData.get("price") || "");
   const guests = Number(formData.get("guests") || 0);
@@ -40,6 +42,7 @@ export async function POST(
     data: {
       name,
       slug,
+      address,
       description,
       price,
       guests,

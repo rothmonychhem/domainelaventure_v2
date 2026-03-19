@@ -143,6 +143,9 @@ export default async function HomePage() {
                       <h3 className="font-heading text-3xl font-semibold text-[var(--accent-dark)]">
                         {cabin.name}
                       </h3>
+                      <p className="mt-2 text-sm font-medium text-stone-500">
+                        {cabin.address}
+                      </p>
                       <p className="mt-3 line-clamp-3 text-sm leading-6 text-stone-700">
                         {cabin.description}
                       </p>

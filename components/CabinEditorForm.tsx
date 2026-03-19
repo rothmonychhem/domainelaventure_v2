@@ -1,7 +1,9 @@
 "use client";
 
+import Image from "next/image";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { amenityOptions, type AmenityField } from "@/lib/amenities";
+import { buildCabinSlug } from "@/lib/cabin-listing";
 
 type ExistingMedia = {
   id: string;
@@ -12,7 +14,7 @@ type ExistingMedia = {
 
 type CabinFormValues = {
   name: string;
-  slug: string;
+  address: string;
   description: string;
   price: string;
   guests: number;
@@ -44,9 +46,14 @@ type MediaDraftItem =
       isHero: boolean;
     };
 
+type AddressFindItem = {
+  Id: string;
+  Text: string;
+};
+
 const defaultValues: CabinFormValues = {
   name: "",
-  slug: "",
+  address: "",
   description: "",
   price: "",
   guests: 1,
@@ -138,6 +145,10 @@ export default function CabinEditorForm({
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const nextIdRef = useRef(0);
   const [isDragging, setIsDragging] = useState(false);
+  const [addressQuery, setAddressQuery] = useState(initialValues?.address ?? "");
+  const [addressOptions, setAddressOptions] = useState<AddressFindItem[]>([]);
+  const [isSearchingAddress, setIsSearchingAddress] = useState(false);
+  const [addressLookupMessage, setAddressLookupMessage] = useState("");
   const [mediaItems, setMediaItems] = useState<MediaDraftItem[]>(() =>
     ensureSingleHero(
       initialMedia.map((item) => ({
@@ -151,6 +162,10 @@ export default function CabinEditorForm({
   );
 
   const values = initialValues ?? defaultValues;
+  const generatedSlug = useMemo(
+    () => buildCabinSlug({ name: values.name || "", address: addressQuery || values.address }),
+    [addressQuery, values.address, values.name]
+  );
 
   useEffect(() => {
     const input = fileInputRef.current;
@@ -273,6 +288,37 @@ export default function CabinEditorForm({
     );
   }
 
+  async function searchAddress() {
+    const trimmed = addressQuery.trim();
+
+    if (trimmed.length < 3) {
+      setAddressLookupMessage("Type at least 3 characters before searching.");
+      setAddressOptions([]);
+      return;
+    }
+
+    setIsSearchingAddress(true);
+    setAddressLookupMessage("");
+
+    try {
+      const response = await fetch(
+        `/api/addresscomplete/find?searchTerm=${encodeURIComponent(trimmed)}`
+      );
+      const payload = (await response.json()) as { items?: AddressFindItem[] };
+      const items = payload.items ?? [];
+
+      setAddressOptions(items);
+      if (items.length === 0) {
+        setAddressLookupMessage("No matching Canadian addresses were found. You can still enter the address manually.");
+      }
+    } catch {
+      setAddressOptions([]);
+      setAddressLookupMessage("Address search is temporarily unavailable. You can still enter the address manually.");
+    } finally {
+      setIsSearchingAddress(false);
+    }
+  }
+
   return (
     <form action={action} method="POST" encType="multipart/form-data" className="mt-8 space-y-8">
       <section className="space-y-5">
@@ -280,13 +326,93 @@ export default function CabinEditorForm({
           Basic listing details
         </h2>
         <input name="name" required defaultValue={values.name} placeholder="Cabin name" className="w-full rounded-[1.2rem] border border-[var(--line)] bg-white px-4 py-3" />
-        <input name="slug" required defaultValue={values.slug} placeholder="forest-haven" className="w-full rounded-[1.2rem] border border-[var(--line)] bg-white px-4 py-3" />
+
+        <div className="space-y-3">
+          <label className="block text-sm font-semibold text-stone-700">
+            Cabin address
+          </label>
+          <div className="flex gap-3">
+            <input
+              name="address"
+              required
+              value={addressQuery}
+              onChange={(event) => setAddressQuery(event.target.value)}
+              placeholder="Cabin address"
+              autoComplete="off"
+              className="w-full rounded-[1.2rem] border border-[var(--line)] bg-white px-4 py-3"
+            />
+            <button
+              type="button"
+              onClick={() => void searchAddress()}
+              className="shrink-0 rounded-full bg-[var(--accent-dark)] px-5 py-3 text-sm font-semibold text-white transition hover:bg-[var(--accent)]"
+            >
+              {isSearchingAddress ? "Searching..." : "Search address"}
+            </button>
+          </div>
+          <input name="slug" value={generatedSlug} readOnly className="hidden" />
+
+          {addressLookupMessage ? (
+            <p className="text-sm leading-6 text-stone-500">{addressLookupMessage}</p>
+          ) : null}
+
+          {addressOptions.length > 0 ? (
+            <div className="rounded-[1.2rem] border border-[var(--line)] bg-white p-2 shadow-[0_24px_60px_rgba(74,47,27,0.12)]">
+              {addressOptions.map((option) => (
+                <button
+                  key={option.Id}
+                  type="button"
+                  onClick={() => {
+                    setAddressQuery(option.Text);
+                    setAddressOptions([]);
+                    setAddressLookupMessage("");
+                  }}
+                  className="block w-full rounded-[0.9rem] px-3 py-3 text-left transition hover:bg-[#f7ecdd]"
+                >
+                  <p className="text-sm font-semibold text-[var(--accent-dark)]">
+                    {option.Text}
+                  </p>
+                </button>
+              ))}
+            </div>
+          ) : null}
+        </div>
+
         <textarea name="description" required rows={5} defaultValue={values.description} placeholder="Describe the atmosphere, setting, and guest experience." className="w-full rounded-[1.2rem] border border-[var(--line)] bg-white px-4 py-3" />
         <input name="price" required defaultValue={values.price} placeholder="$199 / night" className="w-full rounded-[1.2rem] border border-[var(--line)] bg-white px-4 py-3" />
         <div className="grid gap-5 md:grid-cols-3">
-          <input name="guests" required type="number" defaultValue={values.guests} placeholder="Guests" className="w-full rounded-[1.2rem] border border-[var(--line)] bg-white px-4 py-3" />
-          <input name="bedrooms" required type="number" defaultValue={values.bedrooms} placeholder="Bedrooms" className="w-full rounded-[1.2rem] border border-[var(--line)] bg-white px-4 py-3" />
-          <input name="bathrooms" required type="number" defaultValue={values.bathrooms} placeholder="Bathrooms" className="w-full rounded-[1.2rem] border border-[var(--line)] bg-white px-4 py-3" />
+          <label className="block text-sm font-semibold text-stone-700">
+            Guests
+            <input
+              name="guests"
+              required
+              type="number"
+              min={1}
+              defaultValue={values.guests}
+              className="mt-2 w-full rounded-[1.2rem] border border-[var(--line)] bg-white px-4 py-3"
+            />
+          </label>
+          <label className="block text-sm font-semibold text-stone-700">
+            Bedrooms
+            <input
+              name="bedrooms"
+              required
+              type="number"
+              min={1}
+              defaultValue={values.bedrooms}
+              className="mt-2 w-full rounded-[1.2rem] border border-[var(--line)] bg-white px-4 py-3"
+            />
+          </label>
+          <label className="block text-sm font-semibold text-stone-700">
+            Bathrooms
+            <input
+              name="bathrooms"
+              required
+              type="number"
+              min={1}
+              defaultValue={values.bathrooms}
+              className="mt-2 w-full rounded-[1.2rem] border border-[var(--line)] bg-white px-4 py-3"
+            />
+          </label>
         </div>
       </section>
 
@@ -384,9 +510,12 @@ export default function CabinEditorForm({
                 >
                   <div className="overflow-hidden rounded-[1.2rem] bg-stone-100">
                     {isImage ? (
-                      <img
+                      <Image
                         src={previewUrl}
                         alt=""
+                        width={720}
+                        height={480}
+                        unoptimized
                         className="h-40 w-full object-cover"
                       />
                     ) : (

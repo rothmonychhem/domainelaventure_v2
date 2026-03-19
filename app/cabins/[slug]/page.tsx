@@ -37,6 +37,9 @@ export default async function CabinDetailPage({
           <div className="max-w-3xl text-white">
             <p className="eyebrow text-[#f8d7a7]">Private retreat</p>
             <h1 className="section-title mt-4 text-white">{cabin.name}</h1>
+            <p className="mt-4 text-sm font-semibold uppercase tracking-[0.2em] text-[#f7dfba]">
+              {cabin.address}
+            </p>
             <p className="mt-5 max-w-2xl text-base leading-7 text-stone-100 md:text-lg">
               {cabin.description}
             </p>

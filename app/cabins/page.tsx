@@ -61,6 +61,9 @@ export default async function CabinsPage() {
                   <h2 className="font-heading mt-4 text-4xl font-semibold text-[var(--accent-dark)]">
                     {cabin.name}
                   </h2>
+                  <p className="mt-2 text-sm font-medium text-stone-500">
+                    {cabin.address}
+                  </p>
                   <p className="mt-4 max-w-2xl text-sm leading-7 text-stone-700">
                     {cabin.description}
                   </p>

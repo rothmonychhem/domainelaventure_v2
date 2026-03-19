@@ -1,0 +1,2 @@
+ALTER TABLE "Cabin"
+ADD COLUMN "address" TEXT NOT NULL DEFAULT '';
