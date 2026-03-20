@@ -136,6 +136,29 @@ function getMediaTypeFromFile(file: File): "image" | "video" {
   return file.type.startsWith("video/") ? "video" : "image";
 }
 
+function parseStoredPrice(value: string) {
+  const normalized = value.replace(/[^0-9.]/g, "");
+  if (!normalized) {
+    return "";
+  }
+
+  const amount = Number(normalized);
+  return Number.isFinite(amount) ? amount.toFixed(2) : "";
+}
+
+function normalizeMoneyInput(value: string) {
+  const sanitized = value.replace(/[^0-9.]/g, "");
+  const parts = sanitized.split(".");
+
+  if (parts.length === 1) {
+    return parts[0];
+  }
+
+  const dollars = parts[0];
+  const cents = parts.slice(1).join("").slice(0, 2);
+  return `${dollars}.${cents}`;
+}
+
 export default function CabinEditorForm({
   action,
   submitLabel,
@@ -146,6 +169,7 @@ export default function CabinEditorForm({
   const nextIdRef = useRef(0);
   const [isDragging, setIsDragging] = useState(false);
   const [addressQuery, setAddressQuery] = useState(initialValues?.address ?? "");
+  const [priceInput, setPriceInput] = useState(parseStoredPrice(initialValues?.price ?? ""));
   const [addressOptions, setAddressOptions] = useState<AddressFindItem[]>([]);
   const [isSearchingAddress, setIsSearchingAddress] = useState(false);
   const [addressLookupMessage, setAddressLookupMessage] = useState("");
@@ -378,7 +402,32 @@ export default function CabinEditorForm({
         </div>
 
         <textarea name="description" required rows={5} defaultValue={values.description} placeholder="Describe the atmosphere, setting, and guest experience." className="w-full rounded-[1.2rem] border border-[var(--line)] bg-white px-4 py-3" />
-        <input name="price" required defaultValue={values.price} placeholder="$199 / night" className="w-full rounded-[1.2rem] border border-[var(--line)] bg-white px-4 py-3" />
+        <label className="block text-sm font-semibold text-stone-700">
+          Price per night
+          <div className="relative mt-2">
+            <span className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-stone-500">
+              $
+            </span>
+            <input
+              value={priceInput}
+              onChange={(event) => setPriceInput(normalizeMoneyInput(event.target.value))}
+              onBlur={() => {
+                if (!priceInput) {
+                  return;
+                }
+
+                const amount = Number(priceInput);
+                if (Number.isFinite(amount)) {
+                  setPriceInput(amount.toFixed(2));
+                }
+              }}
+              placeholder="199.00"
+              inputMode="decimal"
+              className="w-full rounded-[1.2rem] border border-[var(--line)] bg-white pl-8 pr-4 py-3"
+            />
+            <input name="price" value={priceInput} readOnly className="hidden" />
+          </div>
+        </label>
         <div className="grid gap-5 md:grid-cols-3">
           <label className="block text-sm font-semibold text-stone-700">
             Guests

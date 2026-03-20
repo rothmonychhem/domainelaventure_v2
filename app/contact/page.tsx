@@ -1,5 +1,6 @@
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import { getAllCabins } from "@/lib/cabins";
 
 export default async function ContactPage({
   searchParams,
@@ -9,6 +10,7 @@ export default async function ContactPage({
   const params = await searchParams;
   const cabin = params.cabin ?? "";
   const success = params.success === "1";
+  const cabins = await getAllCabins();
 
   return (
     <main className="shell min-h-screen">
@@ -112,12 +114,19 @@ export default async function ContactPage({
                   <label className="mb-2 block text-sm font-semibold text-stone-700">
                     Interested chalet
                   </label>
-                  <input
+                  <select
                     name="chalet"
                     defaultValue={cabin}
                     required
                     className="w-full rounded-[1.2rem] border border-[var(--line)] bg-white px-4 py-3"
-                  />
+                  >
+                    <option value="">Select a cabin</option>
+                    {cabins.map((item) => (
+                      <option key={item.id} value={item.name}>
+                        {item.name}
+                      </option>
+                    ))}
+                  </select>
                 </div>
               </div>
 

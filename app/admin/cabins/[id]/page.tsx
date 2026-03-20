@@ -8,13 +8,16 @@ export const dynamic = "force-dynamic";
 
 export default async function EditCabinPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ id: string }>;
+  searchParams: Promise<{ error?: string }>;
 }) {
   const session = await getSession();
   if (!session) redirect("/login");
 
   const { id } = await params;
+  const query = await searchParams;
   const cabin = await getCabinById(id);
 
   if (!cabin) {
@@ -34,6 +37,11 @@ export default async function EditCabinPage({
         <h1 className="font-heading mt-3 text-4xl font-semibold text-[var(--accent-dark)]">
           Edit cabin
         </h1>
+        {query.error === "db" ? (
+          <div className="mt-6 rounded-[1.2rem] border border-rose-200 bg-rose-50 px-4 py-4 text-sm leading-6 text-rose-900">
+            The cabin could not be updated because the database connection is unavailable right now.
+          </div>
+        ) : null}
         <CabinEditorForm
           action={`/api/cabins/${cabin.id}`}
           submitLabel="Save changes"

@@ -1,19 +1,29 @@
 import { PrismaClient } from "@prisma/client";
-import { withAccelerate } from "@prisma/extension-accelerate";
+import { PrismaPg } from "@prisma/adapter-pg";
 
 const globalForPrisma = globalThis as unknown as {
-  prisma: ReturnType<typeof createPrismaClient> | undefined;
+  prisma: PrismaClient | undefined;
 };
 
-function getAccelerateUrl() {
-  return process.env.DATABASE_URL || "prisma://localhost?api_key=local-build";
+function getDatabaseUrl() {
+  return process.env.DIRECT_DATABASE_URL || process.env.DATABASE_URL || "";
 }
 
 function createPrismaClient() {
+  const connectionString = getDatabaseUrl();
+
+  if (!connectionString) {
+    throw new Error(
+      "DIRECT_DATABASE_URL or DATABASE_URL must be set to connect Prisma."
+    );
+  }
+
+  const adapter = new PrismaPg({ connectionString });
+
   return new PrismaClient({
-    accelerateUrl: getAccelerateUrl(),
+    adapter,
     log: ["error"],
-  }).$extends(withAccelerate());
+  });
 }
 
 export const prisma = globalForPrisma.prisma ?? createPrismaClient();

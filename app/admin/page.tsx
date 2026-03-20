@@ -5,6 +5,16 @@ import { getAllCabins } from "@/lib/cabins";
 
 export const dynamic = "force-dynamic";
 
+function getCabinHeroImage(
+  images: Array<{ url: string; mediaType: string; isHero: boolean }>
+) {
+  return (
+    images.find((image) => image.isHero && image.mediaType === "image")?.url ||
+    images.find((image) => image.mediaType === "image")?.url ||
+    "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=1200&q=80"
+  );
+}
+
 export default async function AdminPage() {
   const session = await getSession();
 
@@ -49,13 +59,26 @@ export default async function AdminPage() {
           {cabins.map((cabin) => (
             <article
               key={cabin.id}
-              className="rounded-[2rem] border border-[var(--line)] bg-white/82 p-6 shadow-[0_24px_60px_rgba(74,47,27,0.08)]"
+              className="overflow-hidden rounded-[2rem] border border-[var(--line)] bg-white/82 shadow-[0_24px_60px_rgba(74,47,27,0.08)]"
             >
+              <div
+                className="h-64 bg-cover bg-center"
+                style={{
+                  backgroundImage: `linear-gradient(180deg, rgba(27, 20, 16, 0.06), rgba(27, 20, 16, 0.2)), url('${getCabinHeroImage(
+                    cabin.images
+                  )}')`,
+                }}
+              />
+
+              <div className="p-6">
               <div className="flex flex-wrap items-center justify-between gap-4">
                 <div>
                   <h2 className="font-heading text-3xl font-semibold text-[var(--accent-dark)]">
                     {cabin.name}
                   </h2>
+                  <p className="mt-2 text-sm font-medium text-stone-500">
+                    {cabin.address}
+                  </p>
                   <p className="mt-2 text-sm leading-6 text-stone-700">
                     {cabin.description}
                   </p>
@@ -77,6 +100,7 @@ export default async function AdminPage() {
               >
                 Edit cabin
               </Link>
+              </div>
             </article>
           ))}
         </section>

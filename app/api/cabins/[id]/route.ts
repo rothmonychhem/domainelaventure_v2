@@ -5,6 +5,10 @@ import { getAmenitiesFromFormData } from "@/lib/amenities";
 import { parseMediaState, saveUploadedMedia } from "@/lib/cabin-media";
 import { buildCabinSlug } from "@/lib/cabin-listing";
 
+function isDatabaseConnectionError(error: unknown) {
+  return error instanceof Error && error.message.toLowerCase().includes("fetch failed");
+}
+
 export async function POST(
   req: Request,
   { params }: { params: Promise<{ id: string }> }
@@ -37,73 +41,83 @@ export async function POST(
     uploadedFiles.map((file) => saveUploadedMedia(file))
   );
 
-  await prisma.cabin.update({
-    where: { id },
-    data: {
-      name,
-      slug,
-      address,
-      description,
-      price,
-      guests,
-      bedrooms,
-      bathrooms,
-      ...amenities,
-    },
-  });
-
-  const existingMedia = mediaState
-    .filter((item): item is { kind: "existing"; id: string; isHero: boolean } => item.kind === "existing")
-    .map((item, index) => ({
-      id: item.id,
-      position: index,
-      isHero: item.isHero,
-    }));
-
-  const keptIds = existingMedia.map((item) => item.id);
-
-  await prisma.cabinImage.deleteMany({
-    where: {
-      cabinId: id,
-      ...(keptIds.length > 0 ? { id: { notIn: keptIds } } : {}),
-    },
-  });
-
-  await Promise.all(
-    existingMedia.map((item) =>
-      prisma.cabinImage.update({
-        where: { id: item.id },
-        data: {
-          position: item.position,
-          isHero: item.isHero,
-        },
-      })
-    )
-  );
-
-  const newMedia = mediaState.flatMap((item, index) => {
-    if (item.kind !== "new") {
-      return [];
-    }
-
-    const uploaded = uploadedMedia[item.fileIndex];
-    if (!uploaded) {
-      return [];
-    }
-
-    return {
-      url: uploaded.url,
-      mediaType: uploaded.mediaType,
-      isHero: item.isHero && uploaded.mediaType === "image",
-      position: index,
-      cabinId: id,
-    };
-  });
-
-  if (newMedia.length > 0) {
-    await prisma.cabinImage.createMany({
-      data: newMedia,
+  try {
+    await prisma.cabin.update({
+      where: { id },
+      data: {
+        name,
+        slug,
+        address,
+        description,
+        price,
+        guests,
+        bedrooms,
+        bathrooms,
+        ...amenities,
+      },
     });
+
+    const existingMedia = mediaState
+      .filter((item): item is { kind: "existing"; id: string; isHero: boolean } => item.kind === "existing")
+      .map((item, index) => ({
+        id: item.id,
+        position: index,
+        isHero: item.isHero,
+      }));
+
+    const keptIds = existingMedia.map((item) => item.id);
+
+    await prisma.cabinImage.deleteMany({
+      where: {
+        cabinId: id,
+        ...(keptIds.length > 0 ? { id: { notIn: keptIds } } : {}),
+      },
+    });
+
+    await Promise.all(
+      existingMedia.map((item) =>
+        prisma.cabinImage.update({
+          where: { id: item.id },
+          data: {
+            position: item.position,
+            isHero: item.isHero,
+          },
+        })
+      )
+    );
+
+    const newMedia = mediaState.flatMap((item, index) => {
+      if (item.kind !== "new") {
+        return [];
+      }
+
+      const uploaded = uploadedMedia[item.fileIndex];
+      if (!uploaded) {
+        return [];
+      }
+
+      return {
+        url: uploaded.url,
+        mediaType: uploaded.mediaType,
+        isHero: item.isHero && uploaded.mediaType === "image",
+        position: index,
+        cabinId: id,
+      };
+    });
+
+    if (newMedia.length > 0) {
+      await prisma.cabinImage.createMany({
+        data: newMedia,
+      });
+    }
+  } catch (error) {
+    if (isDatabaseConnectionError(error)) {
+      return NextResponse.redirect(new URL(`/admin/cabins/${id}?error=db`, req.url), {
+        status: 303,
+      });
+    }
+
+    throw error;
   }
 
   return NextResponse.redirect(new URL("/admin", req.url), {
