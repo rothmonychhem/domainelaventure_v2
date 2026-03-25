@@ -20,7 +20,11 @@ function getMediaType(file: File) {
 }
 
 export async function saveUploadedMedia(file: File) {
-  const uploadsDir = path.join(process.cwd(), "public", "uploads", "cabins");
+  return saveUploadedMediaToFolder(file, "cabins");
+}
+
+export async function saveUploadedMediaToFolder(file: File, folder: string) {
+  const uploadsDir = path.join(process.cwd(), "public", "uploads", folder);
   await mkdir(uploadsDir, { recursive: true });
 
   const extension = sanitizeExtension(file.name);
@@ -31,7 +35,7 @@ export async function saveUploadedMedia(file: File) {
   await writeFile(filePath, buffer);
 
   return {
-    url: `/uploads/cabins/${fileName}`,
+    url: `/uploads/${folder}/${fileName}`,
     mediaType: getMediaType(file),
   };
 }

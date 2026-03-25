@@ -91,7 +91,7 @@ export default function SectionAccent({
   inverted = false,
 }: {
   icon: AccentIcon;
-  label: string;
+  label: ReactNode;
   inverted?: boolean;
 }) {
   return (

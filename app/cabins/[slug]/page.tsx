@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import { LocalizedText } from "@/components/LanguageProvider";
 import { getCabinBySlug } from "@/lib/cabins";
 import { amenityOptions } from "@/lib/amenities";
 import { getPublishedReviewsForCabin } from "@/lib/reviews";
@@ -14,25 +15,6 @@ function renderStars(rating: number) {
       ★
     </span>
   ));
-}
-
-function getReviewAuthor(review: {
-  reviewerName: string;
-  reviewerLocation: string | null;
-  source: string;
-}) {
-  const baseName =
-    review.reviewerName && review.reviewerName !== "Anonymous"
-      ? review.reviewerName
-      : "Anonymous guest";
-
-  if (review.source === "airbnb") {
-    return baseName === "Anonymous guest"
-      ? "Review from Airbnb"
-      : `${baseName} from Airbnb`;
-  }
-
-  return baseName;
 }
 
 export default async function CabinDetailPage({
@@ -65,7 +47,9 @@ export default async function CabinDetailPage({
           }}
         >
           <div className="max-w-3xl text-white">
-            <p className="eyebrow text-[#f8d7a7]">Private retreat</p>
+            <p className="eyebrow text-[#f8d7a7]">
+              <LocalizedText en="Private retreat" fr="Retraite privee" />
+            </p>
             <h1 className="section-title mt-4 text-white">{cabin.name}</h1>
             <p className="mt-4 text-sm font-semibold uppercase tracking-[0.2em] text-[#f7dfba]">
               {cabin.address}
@@ -81,11 +65,13 @@ export default async function CabinDetailPage({
         <div className="mx-auto grid max-w-7xl gap-6 lg:grid-cols-[0.95fr_1.05fr]">
           <div className="space-y-6">
             <div className="panel rounded-[2rem] p-7">
-              <p className="eyebrow">Stay details</p>
+              <p className="eyebrow">
+                <LocalizedText en="Stay details" fr="Details du sejour" />
+              </p>
               <div className="mt-6 grid gap-4 sm:grid-cols-3">
                 <div className="soft-ring rounded-[1.5rem] bg-white/70 p-5">
                   <p className="text-xs font-semibold uppercase tracking-[0.22em] text-stone-500">
-                    Guests
+                    <LocalizedText en="Guests" fr="Voyageurs" />
                   </p>
                   <p className="font-heading mt-3 text-4xl font-semibold text-[var(--accent-dark)]">
                     {cabin.guests}
@@ -93,7 +79,7 @@ export default async function CabinDetailPage({
                 </div>
                 <div className="soft-ring rounded-[1.5rem] bg-white/70 p-5">
                   <p className="text-xs font-semibold uppercase tracking-[0.22em] text-stone-500">
-                    Bedrooms
+                    <LocalizedText en="Bedrooms" fr="Chambres" />
                   </p>
                   <p className="font-heading mt-3 text-4xl font-semibold text-[var(--accent-dark)]">
                     {cabin.bedrooms}
@@ -101,7 +87,7 @@ export default async function CabinDetailPage({
                 </div>
                 <div className="soft-ring rounded-[1.5rem] bg-white/70 p-5">
                   <p className="text-xs font-semibold uppercase tracking-[0.22em] text-stone-500">
-                    Bathrooms
+                    <LocalizedText en="Bathrooms" fr="Salles de bain" />
                   </p>
                   <p className="font-heading mt-3 text-4xl font-semibold text-[var(--accent-dark)]">
                     {cabin.bathrooms}
@@ -111,7 +97,9 @@ export default async function CabinDetailPage({
             </div>
 
             <div className="panel rounded-[2rem] p-7">
-              <p className="eyebrow">Gallery</p>
+              <p className="eyebrow">
+                <LocalizedText en="Gallery" fr="Galerie" />
+              </p>
               <div className="mt-6 grid gap-4 md:grid-cols-2">
                 {(cabin.images.length > 0
                   ? cabin.images
@@ -143,7 +131,9 @@ export default async function CabinDetailPage({
             </div>
 
             <div className="panel rounded-[2rem] p-7">
-              <p className="eyebrow">What this place offers</p>
+              <p className="eyebrow">
+                <LocalizedText en="What this place offers" fr="Ce que ce lieu offre" />
+              </p>
               <div className="mt-6 grid gap-4 sm:grid-cols-2">
                 {availableAmenities.length > 0 ? (
                   availableAmenities.map((amenity) => (
@@ -161,7 +151,10 @@ export default async function CabinDetailPage({
                   ))
                 ) : (
                   <div className="soft-ring rounded-[1.4rem] bg-white/70 p-5 text-sm leading-6 text-stone-600 sm:col-span-2">
-                    Amenities have not been added for this chalet yet.
+                    <LocalizedText
+                      en="Amenities have not been added for this chalet yet."
+                      fr="Les commodites n'ont pas encore ete ajoutees pour ce chalet."
+                    />
                   </div>
                 )}
               </div>
@@ -170,16 +163,21 @@ export default async function CabinDetailPage({
             <div className="panel rounded-[2rem] p-7">
               <div className="flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
                 <div>
-                  <p className="eyebrow">Guest reviews</p>
+                  <p className="eyebrow">
+                    <LocalizedText en="Guest reviews" fr="Avis voyageurs" />
+                  </p>
                   <h2 className="font-heading mt-3 text-3xl font-semibold text-[var(--accent-dark)]">
-                    What guests say about {cabin.name}
+                    <LocalizedText
+                      en={`What guests say about ${cabin.name}`}
+                      fr={`Ce que les voyageurs disent de ${cabin.name}`}
+                    />
                   </h2>
                 </div>
                 <Link
                   href="/reviews"
                   className="text-sm font-semibold text-[var(--accent)] transition hover:text-[var(--accent-dark)]"
                 >
-                  View all reviews
+                  <LocalizedText en="View all reviews" fr="Voir tous les avis" />
                 </Link>
               </div>
               <div className="mt-6 space-y-4">
@@ -197,15 +195,32 @@ export default async function CabinDetailPage({
                             </p>
                             {review.source === "airbnb" ? (
                               <span className="rounded-full bg-[rgba(86,112,71,0.12)] px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-[var(--accent-dark)]">
-                                From Airbnb
+                                <LocalizedText en="From Airbnb" fr="Depuis Airbnb" />
                               </span>
                             ) : null}
                           </div>
                           <p className="mt-2 text-sm font-medium text-stone-500">
-                            {getReviewAuthor(review)}
-                            {review.reviewerLocation
-                              ? `, ${review.reviewerLocation}`
-                              : ""}
+                            <LocalizedText
+                              en={
+                                review.reviewerName && review.reviewerName !== "Anonymous"
+                                  ? review.source === "airbnb"
+                                    ? `${review.reviewerName} from Airbnb`
+                                    : review.reviewerName
+                                  : review.source === "airbnb"
+                                    ? "Review from Airbnb"
+                                    : "Anonymous guest"
+                              }
+                              fr={
+                                review.reviewerName && review.reviewerName !== "Anonymous"
+                                  ? review.source === "airbnb"
+                                    ? `${review.reviewerName} via Airbnb`
+                                    : review.reviewerName
+                                  : review.source === "airbnb"
+                                    ? "Avis provenant d'Airbnb"
+                                    : "Voyageur anonyme"
+                              }
+                            />
+                            {review.reviewerLocation ? `, ${review.reviewerLocation}` : ""}
                           </p>
                         </div>
                         <div className="text-right">
@@ -213,18 +228,35 @@ export default async function CabinDetailPage({
                             {renderStars(review.rating)}
                           </div>
                           <p className="mt-2 text-xs font-semibold uppercase tracking-[0.2em] text-stone-500">
-                            {review.stayLabel || "Recent stay"}
+                            <LocalizedText
+                              en={review.stayLabel || "Recent stay"}
+                              fr={review.stayLabel || "Sejour recent"}
+                            />
                           </p>
                         </div>
                       </div>
                       <p className="mt-4 text-sm leading-7 text-stone-700">
                         {review.body}
                       </p>
+                      {review.imageUrls.length > 0 ? (
+                        <div className="mt-4 grid gap-3 sm:grid-cols-2">
+                          {review.imageUrls.map((url) => (
+                            <div
+                              key={url}
+                              className="h-40 rounded-[1.4rem] bg-cover bg-center"
+                              style={{ backgroundImage: `url('${url}')` }}
+                            />
+                          ))}
+                        </div>
+                      ) : null}
                     </article>
                   ))
                 ) : (
                   <div className="soft-ring rounded-[1.5rem] bg-white/72 p-5 text-sm leading-7 text-stone-700">
-                    No guest reviews have been added for this cabin yet.
+                    <LocalizedText
+                      en="No guest reviews have been added for this cabin yet."
+                      fr="Aucun avis n'a encore ete ajoute pour ce chalet."
+                    />
                   </div>
                 )}
               </div>
@@ -233,28 +265,52 @@ export default async function CabinDetailPage({
 
           <div className="space-y-6">
             <div className="panel rounded-[2rem] p-7">
-              <p className="eyebrow">Reservation</p>
+              <p className="eyebrow">
+                <LocalizedText en="Reservation" fr="Reservation" />
+              </p>
               <h2 className="font-heading mt-3 text-4xl font-semibold text-[var(--accent-dark)]">
-                Starting from {cabin.price}
+                <LocalizedText
+                  en={`Starting from ${cabin.price}`}
+                  fr={`A partir de ${cabin.price}`}
+                />
               </h2>
               <p className="mt-4 text-sm leading-7 text-stone-700">
-                Invite guests to send a direct reservation request with their
-                preferred dates and questions. No marketplace detour required.
+                <LocalizedText
+                  en="Invite guests to send a direct reservation request with their preferred dates and questions. No marketplace detour required."
+                  fr="Invitez les voyageurs a envoyer une demande de reservation directe avec leurs dates preferees et leurs questions, sans detour par une plateforme."
+                />
               </p>
               <Link
                 href={`/contact?cabin=${encodeURIComponent(cabin.name)}`}
                 className="mt-6 inline-block rounded-full bg-[var(--accent-dark)] px-6 py-3 font-semibold text-white transition hover:bg-[var(--accent)]"
               >
-                Reserve this cabin
+                <LocalizedText en="Reserve this cabin" fr="Reserver ce chalet" />
               </Link>
             </div>
 
             <div className="panel rounded-[2rem] p-7">
-              <p className="eyebrow">Why guests will love it</p>
+              <p className="eyebrow">
+                <LocalizedText en="Why guests will love it" fr="Pourquoi ce chalet plaira" />
+              </p>
               <ul className="mt-5 space-y-3 text-sm leading-7 text-stone-700">
-                <li>Peaceful nature setting with a more intimate brand feel.</li>
-                <li>Visual detail page that helps each cabin stand on its own.</li>
-                <li>Simple inquiry path that goes directly to your business.</li>
+                <li>
+                  <LocalizedText
+                    en="Peaceful nature setting with a more intimate brand feel."
+                    fr="Un cadre naturel paisible avec une atmosphere plus intime."
+                  />
+                </li>
+                <li>
+                  <LocalizedText
+                    en="Visual detail page that helps each cabin stand on its own."
+                    fr="Une page detaillee qui permet a chaque chalet de se distinguer."
+                  />
+                </li>
+                <li>
+                  <LocalizedText
+                    en="Simple inquiry path that goes directly to your business."
+                    fr="Un parcours de demande simple qui arrive directement a votre entreprise."
+                  />
+                </li>
               </ul>
             </div>
           </div>

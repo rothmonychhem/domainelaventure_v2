@@ -2,15 +2,25 @@ import Link from "next/link";
 import FeaturedCabinsSlideshow from "@/components/FeaturedCabinsSlideshow";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import { LocalizedText } from "@/components/LanguageProvider";
 import SectionAccent from "@/components/SectionAccent";
 import { getAllCabins } from "@/lib/cabins";
 
 export const dynamic = "force-dynamic";
 
 const highlights = [
-  "Direct reservation requests with no marketplace fees",
-  "Owner/dev login hidden in the footer for lightweight management",
-  "Cabin detail pages with galleries, amenities, and clear calls to reserve",
+  {
+    en: "Direct reservation requests with no marketplace fees",
+    fr: "Demandes de reservation directes sans frais de plateforme",
+  },
+  {
+    en: "Owner/dev login hidden in the footer for lightweight management",
+    fr: "Connexion proprietaire/dev discretement placee dans le pied de page pour une gestion legere",
+  },
+  {
+    en: "Cabin detail pages with galleries, amenities, and clear calls to reserve",
+    fr: "Pages detaillees pour chaque chalet avec galerie, commodites et reservation claire",
+  },
 ];
 
 function getCabinCardImage(
@@ -53,26 +63,36 @@ export default async function HomePage() {
             }}
           >
             <div className="relative flex h-full max-w-2xl flex-col justify-end text-white">
-              <p className="eyebrow text-[#f8d7a7]">Forest calm, elevated</p>
+              <p className="eyebrow text-[#f8d7a7]">
+                <LocalizedText en="Forest calm, elevated" fr="Calme de la foret, raffine" />
+              </p>
               <h1 className="section-title mt-4 max-w-3xl text-white">
-                Cozy chalet stays with a warmer, more memorable brand presence.
+                <LocalizedText
+                  en="Cozy chalet stays with a warmer, more memorable brand presence."
+                  fr="Des sejours en chalet plus chaleureux, avec une presence de marque plus elegante et memorable."
+                />
               </h1>
               <p className="mt-6 max-w-xl text-base leading-7 text-stone-100 md:text-lg">
-                Domaine Aventure helps guests discover your cabins, explore each
-                chalet in detail, and send reservation requests directly to you.
+                <LocalizedText
+                  en="Domaine Aventure helps guests discover your cabins, explore each chalet in detail, and send reservation requests directly to you."
+                  fr="Domaine Aventure aide les voyageurs a decouvrir vos chalets, explorer chaque sejour en detail et envoyer une demande de reservation directement."
+                />
               </p>
               <div className="mt-8 flex flex-col gap-4 sm:flex-row">
                 <Link
                   href="/cabins"
                   className="rounded-full bg-[#f6e7cf] px-6 py-3 text-center font-semibold text-[var(--accent-dark)] transition hover:bg-white"
                 >
-                  Explore the cabins
+                  <LocalizedText en="Explore the cabins" fr="Explorer les chalets" />
                 </Link>
                 <Link
                   href="/contact"
                   className="rounded-full border border-white/50 px-6 py-3 text-center font-semibold text-white transition hover:bg-white hover:text-[var(--accent-dark)]"
                 >
-                  Request a reservation
+                  <LocalizedText
+                    en="Request a reservation"
+                    fr="Demander une reservation"
+                  />
                 </Link>
               </div>
             </div>
@@ -80,11 +100,19 @@ export default async function HomePage() {
 
           <div className="grid gap-6">
             <div className="panel rounded-[2rem] p-7 md:p-8">
-              <SectionAccent icon="spark" label="Why this setup works" />
+              <SectionAccent
+                icon="spark"
+                label={
+                  <LocalizedText
+                    en="Why this setup works"
+                    fr="Pourquoi cette approche fonctionne"
+                  />
+                }
+              />
               <div className="mt-5 space-y-4">
                 {highlights.map((item) => (
                   <div
-                    key={item}
+                    key={item.en}
                     className="soft-ring flex items-start gap-3 rounded-[1.5rem] bg-white/70 px-4 py-4 text-sm leading-6 text-stone-700"
                   >
                     <span className="mt-0.5 inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[rgba(239,229,206,0.9)] text-[var(--accent-dark)]">
@@ -95,22 +123,29 @@ export default async function HomePage() {
                         />
                       </svg>
                     </span>
-                    {item}
+                    <LocalizedText en={item.en} fr={item.fr} />
                   </div>
                 ))}
               </div>
             </div>
 
             <div className="panel rounded-[2rem] p-7 md:p-8">
-              <SectionAccent icon="mail" label="Reservation flow" />
+              <SectionAccent
+                icon="mail"
+                label={<LocalizedText en="Reservation flow" fr="Parcours de reservation" />}
+              />
               <div className="mt-4 space-y-4 text-sm leading-6 text-stone-700">
                 <p>
-                  Guests choose a cabin, review the details page, and submit a
-                  request with their dates and comments.
+                  <LocalizedText
+                    en="Guests choose a cabin, review the details page, and submit a request with their dates and comments."
+                    fr="Les voyageurs choisissent un chalet, consultent la page detaillee et envoient une demande avec leurs dates et commentaires."
+                  />
                 </p>
                 <p>
-                  Each request is saved in the database and can notify you by
-                  email, with optional SMS if you later connect Twilio.
+                  <LocalizedText
+                    en="Each request is saved in the database and can notify you by email, with optional SMS if you later connect Twilio."
+                    fr="Chaque demande est enregistree et peut vous avertir par courriel, avec des SMS en option si vous connectez Twilio plus tard."
+                  />
                 </p>
               </div>
             </div>
@@ -122,16 +157,21 @@ export default async function HomePage() {
         <div className="mx-auto max-w-7xl">
           <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
             <div>
-              <p className="eyebrow">Featured cabins</p>
+              <p className="eyebrow">
+                <LocalizedText en="Featured cabins" fr="Chalets en vedette" />
+              </p>
               <h2 className="font-heading mt-3 text-4xl font-semibold text-[var(--accent-dark)]">
-                A first look at the retreat experience
+                <LocalizedText
+                  en="A first look at the retreat experience"
+                  fr="Un premier apercu de l'experience du refuge"
+                />
               </h2>
             </div>
             <Link
               href="/cabins"
               className="text-sm font-semibold text-[var(--accent)] transition hover:text-[var(--accent-dark)]"
             >
-              View all cabins
+              <LocalizedText en="View all cabins" fr="Voir tous les chalets" />
             </Link>
           </div>
 
@@ -141,18 +181,23 @@ export default async function HomePage() {
                 <div className="grid gap-6 md:grid-cols-[1fr_auto] md:items-center">
                   <div>
                     <p className="font-heading text-3xl font-semibold text-[var(--accent-dark)]">
-                      The first hero now carries the page.
+                      <LocalizedText
+                        en="The first hero now carries the page."
+                        fr="Le grand visuel principal porte maintenant la page."
+                      />
                     </p>
                     <p className="mt-3 max-w-2xl text-sm leading-7 text-stone-700">
-                      No cabins are published yet, so this area stays quiet until
-                      you add one from the admin side.
+                      <LocalizedText
+                        en="No cabins are published yet, so this area stays quiet until you add one from the admin side."
+                        fr="Aucun chalet n'est encore publie, donc cette zone reste sobre jusqu'a ce que vous en ajoutiez un depuis l'administration."
+                      />
                     </p>
                   </div>
                   <Link
                     href="/admin"
                     className="rounded-full bg-[var(--accent-dark)] px-5 py-3 text-center text-sm font-semibold text-white transition hover:bg-[var(--accent)]"
                   >
-                    Go to admin
+                    <LocalizedText en="Go to admin" fr="Aller a l'administration" />
                   </Link>
                 </div>
               </div>
@@ -166,24 +211,38 @@ export default async function HomePage() {
       <section className="px-6 pb-18 pt-8">
         <div className="mx-auto grid max-w-7xl gap-6 rounded-[2rem] bg-[var(--pine)] px-7 py-10 text-white md:grid-cols-[0.95fr_1.05fr] md:px-10">
           <div>
-            <p className="eyebrow text-[#d6c5a8]">Low-cost friendly</p>
+            <p className="eyebrow text-[#d6c5a8]">
+              <LocalizedText en="Low-cost friendly" fr="Pensé pour rester abordable" />
+            </p>
             <h2 className="font-heading mt-3 text-4xl font-semibold text-[#f7e7cd]">
-              Built to stay simple to manage.
+              <LocalizedText
+                en="Built to stay simple to manage."
+                fr="Concu pour rester simple a gerer."
+              />
             </h2>
           </div>
           <div className="space-y-4 text-sm leading-7 text-stone-100">
             <p>
-              This structure keeps things efficient: static pages, direct forms,
-              a lightweight admin, and no unnecessary subscription-heavy tools.
+              <LocalizedText
+                en="This structure keeps things efficient: static pages, direct forms, a lightweight admin, and no unnecessary subscription-heavy tools."
+                fr="Cette structure reste efficace : pages statiques, formulaires directs, administration legere et aucun outil inutilement charge en abonnements."
+              />
             </p>
             <p>
-              If you want, we can next connect your real branding, add more cabin
-              content, and plug in your notification credentials.
+              <LocalizedText
+                en="If you want, we can next connect your real branding, add more cabin content, and plug in your notification credentials."
+                fr="Si vous le souhaitez, nous pouvons ensuite connecter votre vraie image de marque, ajouter plus de contenu et brancher vos identifiants de notification."
+              />
             </p>
             <div className="pt-2">
               <SectionAccent
                 icon="pine"
-                label="Simple setup, warm guest feel"
+                label={
+                  <LocalizedText
+                    en="Simple setup, warm guest feel"
+                    fr="Mise en place simple, ambiance chaleureuse"
+                  />
+                }
                 inverted
               />
             </div>

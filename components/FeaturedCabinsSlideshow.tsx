@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { useLanguage } from "@/components/LanguageProvider";
 
 type FeaturedCabinSlide = {
   id: string;
@@ -23,6 +24,7 @@ const AUTO_ROTATE_MS = 4800;
 export default function FeaturedCabinsSlideshow({
   cabins,
 }: FeaturedCabinsSlideshowProps) {
+  const { language } = useLanguage();
   const [activeIndex, setActiveIndex] = useState(0);
 
   useEffect(() => {
@@ -54,7 +56,11 @@ export default function FeaturedCabinsSlideshow({
         <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(17,20,16,0.66),rgba(17,20,16,0.18)_56%,rgba(17,20,16,0.36))]" />
         <div className="relative flex h-full flex-col justify-end px-7 py-8 text-white md:px-10 md:py-10">
           <div className="max-w-2xl">
-            <p className="eyebrow text-[#e6d9bc]">Featured cabin spotlight</p>
+            <p className="eyebrow text-[#e6d9bc]">
+              {language === "fr"
+                ? "Chalet en vedette"
+                : "Featured cabin spotlight"}
+            </p>
             <h3 className="font-heading mt-4 text-5xl font-semibold leading-[0.95] tracking-tight md:text-6xl">
               {activeCabin.name}
             </h3>
@@ -67,10 +73,14 @@ export default function FeaturedCabinsSlideshow({
 
             <div className="mt-6 flex flex-wrap gap-3 text-sm font-semibold text-[#f1ead9]">
               <span className="rounded-full border border-white/20 bg-white/10 px-4 py-2 backdrop-blur-sm">
-                Up to {activeCabin.guests} guests
+                {language === "fr"
+                  ? `Jusqu'a ${activeCabin.guests} voyageurs`
+                  : `Up to ${activeCabin.guests} guests`}
               </span>
               <span className="rounded-full border border-white/20 bg-white/10 px-4 py-2 backdrop-blur-sm">
-                Starting from {activeCabin.price}
+                {language === "fr"
+                  ? `A partir de ${activeCabin.price}`
+                  : `Starting from ${activeCabin.price}`}
               </span>
             </div>
 
@@ -79,13 +89,13 @@ export default function FeaturedCabinsSlideshow({
                 href={`/cabins/${activeCabin.slug}`}
                 className="rounded-full bg-[#f6e7cf] px-6 py-3 text-center font-semibold text-[var(--accent-dark)] transition hover:bg-white"
               >
-                View cabin details
+                {language === "fr" ? "Voir le chalet" : "View cabin details"}
               </Link>
               <Link
                 href={`/contact?cabin=${encodeURIComponent(activeCabin.name)}`}
                 className="rounded-full border border-white/50 px-6 py-3 text-center font-semibold text-white transition hover:bg-white hover:text-[var(--accent-dark)]"
               >
-                Request this cabin
+                {language === "fr" ? "Reserver ce chalet" : "Request this cabin"}
               </Link>
             </div>
           </div>

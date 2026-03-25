@@ -13,15 +13,22 @@ export async function POST(req: Request) {
   }
 
   try {
-    const review = await createPublicReview({
-      reviewerName: String(formData.get("reviewerName") || ""),
-      reviewerLocation: String(formData.get("reviewerLocation") || ""),
-      title: String(formData.get("title") || ""),
-      body: String(formData.get("body") || ""),
-      rating: String(formData.get("rating") || ""),
-      stayLabel: String(formData.get("stayLabel") || ""),
-      cabinId: String(formData.get("cabinId") || ""),
-    });
+    const uploadedFiles = formData
+      .getAll("photos")
+      .filter((entry): entry is File => entry instanceof File && entry.size > 0);
+
+    const review = await createPublicReview(
+      {
+        reviewerName: String(formData.get("reviewerName") || ""),
+        reviewerLocation: String(formData.get("reviewerLocation") || ""),
+        title: String(formData.get("title") || ""),
+        body: String(formData.get("body") || ""),
+        rating: String(formData.get("rating") || ""),
+        stayLabel: String(formData.get("stayLabel") || ""),
+        cabinId: String(formData.get("cabinId") || ""),
+      },
+      uploadedFiles
+    );
 
     return NextResponse.json({ review });
   } catch (error) {

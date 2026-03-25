@@ -1,5 +1,6 @@
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import { LocalizedText } from "@/components/LanguageProvider";
 import SectionAccent from "@/components/SectionAccent";
 import { getAllCabins } from "@/lib/cabins";
 
@@ -28,13 +29,27 @@ export default async function ContactPage({
               backgroundPosition: "center",
             }}
           >
-            <SectionAccent icon="mail" label="Reservation request" inverted />
+            <SectionAccent
+              icon="mail"
+              label={
+                <LocalizedText
+                  en="Reservation request"
+                  fr="Demande de reservation"
+                />
+              }
+              inverted
+            />
             <h1 className="font-heading mt-3 text-5xl font-semibold text-white">
-              Send your preferred dates and we will follow up directly.
+              <LocalizedText
+                en="Send your preferred dates and we will follow up directly."
+                fr="Envoyez vos dates preferees et nous ferons le suivi directement."
+              />
             </h1>
             <p className="mt-5 text-sm leading-7 text-stone-100">
-              Feel free to send a message for any inquiries, and we will answer
-              as fast as possible.
+              <LocalizedText
+                en="Feel free to send a message for any inquiries, and we will answer as fast as possible."
+                fr="N'hesitez pas a envoyer un message pour toute question, et nous repondrons aussi rapidement que possible."
+              />
             </p>
 
             <div className="mt-8 space-y-4">
@@ -53,12 +68,14 @@ export default async function ContactPage({
                     </svg>
                   </span>
                   <p className="text-xs font-semibold uppercase tracking-[0.22em] text-stone-200">
-                    What we collect
+                    <LocalizedText en="What we collect" fr="Ce que nous recueillons" />
                   </p>
                 </div>
                 <p className="mt-2 text-sm leading-6 text-stone-100">
-                  Name, email, phone number, interested chalet, ideal dates, and
-                  any extra comments.
+                  <LocalizedText
+                    en="Name, email, phone number, interested chalet, ideal dates, and any extra comments."
+                    fr="Nom, courriel, numero de telephone, chalet souhaite, dates ideales et tout commentaire utile."
+                  />
                 </p>
               </div>
               <div className="rounded-[1.5rem] border border-white/20 bg-white/10 p-4 backdrop-blur-sm">
@@ -72,11 +89,14 @@ export default async function ContactPage({
                     </svg>
                   </span>
                   <p className="text-xs font-semibold uppercase tracking-[0.22em] text-stone-200">
-                    Best for
+                    <LocalizedText en="Best for" fr="Ideal pour" />
                   </p>
                 </div>
                 <p className="mt-2 text-sm leading-6 text-stone-100">
-                  A direct booking workflow without marketplace commissions.
+                  <LocalizedText
+                    en="A direct booking workflow without marketplace commissions."
+                    fr="Un parcours de reservation directe sans commissions de plateforme."
+                  />
                 </p>
               </div>
               <div className="rounded-[1.5rem] border border-white/20 bg-white/10 p-4 backdrop-blur-sm">
@@ -94,12 +114,14 @@ export default async function ContactPage({
                     </svg>
                   </span>
                   <p className="text-xs font-semibold uppercase tracking-[0.22em] text-stone-200">
-                    Response time
+                    <LocalizedText en="Response time" fr="Delai de reponse" />
                   </p>
                 </div>
                 <p className="mt-2 text-sm leading-6 text-stone-100">
-                  Send us your preferred dates, special requests, or questions
-                  about the chalet, and we will reply as quickly as possible.
+                  <LocalizedText
+                    en="Send us your preferred dates, special requests, or questions about the chalet, and we will reply as quickly as possible."
+                    fr="Envoyez vos dates preferees, vos demandes speciales ou vos questions sur le chalet, et nous repondrons le plus vite possible."
+                  />
                 </p>
               </div>
             </div>
@@ -108,8 +130,10 @@ export default async function ContactPage({
           <div className="panel rounded-[2rem] p-7 md:p-8">
             {success ? (
               <div className="mb-6 rounded-[1.5rem] border border-emerald-200 bg-emerald-50 px-4 py-4 text-sm text-emerald-900">
-                Reservation request sent successfully. We will review it and get
-                back to you shortly.
+                <LocalizedText
+                  en="Reservation request sent successfully. We will review it and get back to you shortly."
+                  fr="La demande de reservation a ete envoyee avec succes. Nous l'examinerons et reviendrons vers vous rapidement."
+                />
               </div>
             ) : null}
 
@@ -117,7 +141,7 @@ export default async function ContactPage({
               <div className="grid gap-5 md:grid-cols-2">
                 <div>
                   <label className="mb-2 block text-sm font-semibold text-stone-700">
-                    Name
+                    <LocalizedText en="Name" fr="Nom" />
                   </label>
                   <input
                     name="name"
@@ -127,7 +151,7 @@ export default async function ContactPage({
                 </div>
                 <div>
                   <label className="mb-2 block text-sm font-semibold text-stone-700">
-                    Email
+                    <LocalizedText en="Email" fr="Courriel" />
                   </label>
                   <input
                     type="email"
@@ -141,7 +165,7 @@ export default async function ContactPage({
               <div className="grid gap-5 md:grid-cols-2">
                 <div>
                   <label className="mb-2 block text-sm font-semibold text-stone-700">
-                    Phone number
+                    <LocalizedText en="Phone number" fr="Numero de telephone" />
                   </label>
                   <input
                     name="phone"
@@ -151,7 +175,7 @@ export default async function ContactPage({
                 </div>
                 <div>
                   <label className="mb-2 block text-sm font-semibold text-stone-700">
-                    Interested chalet
+                    <LocalizedText en="Interested chalet" fr="Chalet souhaite" />
                   </label>
                   <select
                     name="chalet"
@@ -159,7 +183,9 @@ export default async function ContactPage({
                     required
                     className="w-full rounded-[1.2rem] border border-[var(--line)] bg-white px-4 py-3"
                   >
-                    <option value="">Select a cabin</option>
+                    <option value="">
+                      <LocalizedText en="Select a cabin" fr="Choisir un chalet" />
+                    </option>
                     {cabins.map((item) => (
                       <option key={item.id} value={item.name}>
                         {item.name}
@@ -172,7 +198,7 @@ export default async function ContactPage({
               <div className="grid gap-5 md:grid-cols-2">
                 <div>
                   <label className="mb-2 block text-sm font-semibold text-stone-700">
-                    Ideal start date
+                    <LocalizedText en="Ideal start date" fr="Date d'arrivee ideale" />
                   </label>
                   <input
                     type="date"
@@ -183,7 +209,7 @@ export default async function ContactPage({
                 </div>
                 <div>
                   <label className="mb-2 block text-sm font-semibold text-stone-700">
-                    Ideal end date
+                    <LocalizedText en="Ideal end date" fr="Date de depart ideale" />
                   </label>
                   <input
                     type="date"
@@ -196,7 +222,7 @@ export default async function ContactPage({
 
               <div>
                 <label className="mb-2 block text-sm font-semibold text-stone-700">
-                  Other comments
+                  <LocalizedText en="Other comments" fr="Autres commentaires" />
                 </label>
                 <textarea
                   name="comments"
@@ -206,7 +232,10 @@ export default async function ContactPage({
               </div>
 
               <button className="rounded-full bg-[var(--accent-dark)] px-6 py-3 font-semibold text-white transition hover:bg-[var(--accent)]">
-                Send reservation request
+                <LocalizedText
+                  en="Send reservation request"
+                  fr="Envoyer la demande de reservation"
+                />
               </button>
             </form>
           </div>

@@ -4,6 +4,7 @@ import path from "path";
 import { Prisma } from "@prisma/client";
 import { z } from "zod";
 import { getAllCabins } from "@/lib/cabins";
+import { saveUploadedMediaToFolder } from "@/lib/cabin-media";
 import { prisma } from "@/lib/prisma";
 
 const reviewInclude = {
@@ -34,6 +35,7 @@ export type ReviewRecord = {
   cabinId: string | null;
   cabinName: string | null;
   cabinSlug: string | null;
+  imageUrls: string[];
   createdAt: string;
   updatedAt: string;
 };
@@ -121,6 +123,7 @@ function mapDbReview(review: ReviewWithCabin): ReviewRecord {
     cabinId: review.cabinId ?? null,
     cabinName: review.cabin?.name ?? null,
     cabinSlug: review.cabin?.slug ?? null,
+    imageUrls: review.imageUrls ?? [],
     createdAt: review.createdAt.toISOString(),
     updatedAt: review.updatedAt.toISOString(),
   };
@@ -149,6 +152,7 @@ async function readFileReviews() {
       cabinId: review.cabinId ?? null,
       cabinName: review.cabinName ?? null,
       cabinSlug: review.cabinSlug ?? null,
+      imageUrls: Array.isArray(review.imageUrls) ? review.imageUrls : [],
     }))
   );
 }
@@ -255,13 +259,37 @@ export async function getAllStoredReviews() {
   return readFileReviews();
 }
 
-export async function createPublicReview(input: unknown) {
+async function saveReviewImages(files: File[]) {
+  if (files.length > 4) {
+    throw new Error("You can upload up to 4 stay photos.");
+  }
+
+  const savedUrls: string[] = [];
+
+  for (const file of files) {
+    if (!file.type.startsWith("image/")) {
+      throw new Error("Only image files are allowed for review photos.");
+    }
+
+    if (file.size > 5 * 1024 * 1024) {
+      throw new Error("Each review photo must be under 5 MB.");
+    }
+
+    const uploaded = await saveUploadedMediaToFolder(file, "reviews");
+    savedUrls.push(uploaded.url);
+  }
+
+  return savedUrls;
+}
+
+export async function createPublicReview(input: unknown, files: File[] = []) {
   const parsed = publicReviewSchema.parse(input);
   const now = new Date();
   const cabin = await resolveCabin({
     cabinId: parsed.cabinId,
     cabinName: parsed.cabinName,
   });
+  const imageUrls = await saveReviewImages(files);
 
   if (isDatabaseConfigured()) {
     try {
@@ -277,6 +305,7 @@ export async function createPublicReview(input: unknown) {
           approved: true,
           featured: false,
           cabinId: cabin.cabinId,
+          imageUrls,
         },
         include: reviewInclude,
       });
@@ -303,6 +332,7 @@ export async function createPublicReview(input: unknown) {
     cabinId: cabin.cabinId,
     cabinName: cabin.cabinName,
     cabinSlug: cabin.cabinSlug,
+    imageUrls,
     createdAt: now.toISOString(),
     updatedAt: now.toISOString(),
   };
@@ -384,6 +414,7 @@ export async function importAirbnbReviews(raw: string) {
             approved: true,
             featured: parsed.featured,
             cabinId: cabin.cabinId,
+            imageUrls: [],
           },
         });
 
@@ -421,6 +452,7 @@ export async function importAirbnbReviews(raw: string) {
       cabinId: cabin.cabinId,
       cabinName: cabin.cabinName,
       cabinSlug: cabin.cabinSlug,
+      imageUrls: [],
       createdAt: now,
       updatedAt: now,
     });

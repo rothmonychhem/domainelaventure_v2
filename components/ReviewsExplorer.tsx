@@ -2,6 +2,7 @@
 
 import { useDeferredValue, useMemo, useState, useTransition } from "react";
 import Link from "next/link";
+import { useLanguage } from "@/components/LanguageProvider";
 import type { ReviewRecord } from "@/lib/reviews";
 
 type CabinOption = {
@@ -24,16 +25,22 @@ function renderStars(rating: number) {
   ));
 }
 
-function getReviewAuthor(review: ReviewRecord) {
+function getReviewAuthor(review: ReviewRecord, language: "en" | "fr") {
   if (review.source === "airbnb") {
     return review.reviewerName && review.reviewerName !== "Anonymous"
-      ? `${review.reviewerName} from Airbnb`
-      : "Review from Airbnb";
+      ? language === "fr"
+        ? `${review.reviewerName} via Airbnb`
+        : `${review.reviewerName} from Airbnb`
+      : language === "fr"
+        ? "Avis provenant d'Airbnb"
+        : "Review from Airbnb";
   }
 
   return review.reviewerName && review.reviewerName !== "Anonymous"
     ? review.reviewerName
-    : "Anonymous guest";
+    : language === "fr"
+      ? "Voyageur anonyme"
+      : "Anonymous guest";
 }
 
 export default function ReviewsExplorer({
@@ -45,11 +52,14 @@ export default function ReviewsExplorer({
   cabins: CabinOption[];
   importHref?: string;
 }) {
+  const { language } = useLanguage();
   const [reviews, setReviews] = useState(initialReviews);
   const [sourceFilter, setSourceFilter] = useState("all");
   const [ratingFilter, setRatingFilter] = useState("all");
   const [cabinFilter, setCabinFilter] = useState("all");
   const [search, setSearch] = useState("");
+  const [selectedRating, setSelectedRating] = useState(5);
+  const [photoNames, setPhotoNames] = useState<string[]>([]);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [isPending, startTransition] = useTransition();
@@ -98,6 +108,7 @@ export default function ReviewsExplorer({
 
     const form = event.currentTarget;
     const formData = new FormData(form);
+    formData.set("rating", String(selectedRating));
 
     startTransition(async () => {
       try {
@@ -115,13 +126,21 @@ export default function ReviewsExplorer({
         }
 
         setReviews((current) => [payload.review!, ...current]);
-        setSuccess("Thanks for sharing your stay. Your review is now live.");
+        setSuccess(
+          language === "fr"
+            ? "Merci d'avoir partage votre sejour. Votre avis est maintenant publie."
+            : "Thanks for sharing your stay. Your review is now live."
+        );
+        setSelectedRating(5);
+        setPhotoNames([]);
         form.reset();
       } catch (submitError) {
         setError(
           submitError instanceof Error
             ? submitError.message
-            : "Unable to save your review."
+            : language === "fr"
+              ? "Impossible d'enregistrer votre avis."
+              : "Unable to save your review."
         );
       }
     });
@@ -131,36 +150,40 @@ export default function ReviewsExplorer({
     <div className="space-y-8">
       <section className="grid gap-6 xl:grid-cols-[1.08fr_0.92fr]">
         <div className="panel rounded-[2rem] p-7 md:p-8">
-          <p className="eyebrow">Leave a review</p>
+          <p className="eyebrow">{language === "fr" ? "Laisser un avis" : "Leave a review"}</p>
           <h2 className="font-heading mt-3 text-4xl font-semibold text-[var(--accent-dark)]">
-            Share the feeling of your stay.
+            {language === "fr"
+              ? "Partagez le ressenti de votre sejour."
+              : "Share the feeling of your stay."}
           </h2>
           <p className="mt-4 max-w-2xl text-sm leading-7 text-stone-700">
-            Tell future guests what stood out most, whether it was the quiet
-            mornings, the fireplace, or the way the forest felt around the cabin.
+            {language === "fr"
+              ? "Dites aux futurs voyageurs ce qui vous a le plus marque, que ce soit les matins calmes, le foyer ou l'atmosphere de la foret autour du chalet."
+              : "Tell future guests what stood out most, whether it was the quiet mornings, the fireplace, or the way the forest felt around the cabin."}
           </p>
 
           <form onSubmit={handleSubmit} className="mt-6 space-y-4">
             <input type="text" name="website" className="hidden" tabIndex={-1} />
+            <input type="hidden" name="rating" value={selectedRating} />
 
             <div className="grid gap-4 md:grid-cols-2">
               <div>
                 <label className="mb-2 block text-sm font-semibold text-stone-700">
-                  Name
+                  {language === "fr" ? "Nom" : "Name"}
                 </label>
                 <input
                   name="reviewerName"
-                  placeholder="Optional"
+                  placeholder={language === "fr" ? "Optionnel" : "Optional"}
                   className="w-full rounded-[1.2rem] border border-[var(--line)] bg-white px-4 py-3"
                 />
               </div>
               <div>
                 <label className="mb-2 block text-sm font-semibold text-stone-700">
-                  Location
+                  {language === "fr" ? "Lieu" : "Location"}
                 </label>
                 <input
                   name="reviewerLocation"
-                  placeholder="Optional"
+                  placeholder={language === "fr" ? "Optionnel" : "Optional"}
                   className="w-full rounded-[1.2rem] border border-[var(--line)] bg-white px-4 py-3"
                 />
               </div>
@@ -169,14 +192,16 @@ export default function ReviewsExplorer({
             <div className="grid gap-4 md:grid-cols-2">
               <div>
                 <label className="mb-2 block text-sm font-semibold text-stone-700">
-                  Cabin
+                  {language === "fr" ? "Chalet" : "Cabin"}
                 </label>
                 <select
                   name="cabinId"
                   className="w-full rounded-[1.2rem] border border-[var(--line)] bg-white px-4 py-3"
                   defaultValue=""
                 >
-                  <option value="">General experience</option>
+                  <option value="">
+                    {language === "fr" ? "Experience generale" : "General experience"}
+                  </option>
                   {cabins.map((cabin) => (
                     <option key={cabin.id} value={cabin.id}>
                       {cabin.name}
@@ -186,26 +211,47 @@ export default function ReviewsExplorer({
               </div>
               <div>
                 <label className="mb-2 block text-sm font-semibold text-stone-700">
-                  Rating
+                  {language === "fr" ? "Note en etoiles" : "Star rating"}
                 </label>
-                <select
-                  name="rating"
-                  defaultValue="5"
-                  className="w-full rounded-[1.2rem] border border-[var(--line)] bg-white px-4 py-3"
-                >
-                  <option value="5">5 stars</option>
-                  <option value="4">4 stars</option>
-                  <option value="3">3 stars</option>
-                  <option value="2">2 stars</option>
-                  <option value="1">1 star</option>
-                </select>
+                <div className="flex items-center gap-2 rounded-[1.2rem] border border-[var(--line)] bg-white px-4 py-3">
+                  {Array.from({ length: 5 }, (_, index) => {
+                    const starValue = index + 1;
+
+                    return (
+                      <button
+                        key={starValue}
+                        type="button"
+                        onClick={() => setSelectedRating(starValue)}
+                        className="text-2xl leading-none transition hover:scale-110"
+                        aria-label={
+                          language === "fr"
+                            ? `Choisir ${starValue} etoiles`
+                            : `Set ${starValue} star rating`
+                        }
+                      >
+                        <span
+                          className={
+                            starValue <= selectedRating
+                              ? "text-[#d89a31]"
+                              : "text-stone-300"
+                          }
+                        >
+                          ★
+                        </span>
+                      </button>
+                    );
+                  })}
+                  <span className="ml-2 text-sm font-semibold text-stone-600">
+                    {selectedRating}/5
+                  </span>
+                </div>
               </div>
             </div>
 
             <div className="grid gap-4 md:grid-cols-2">
               <div>
                 <label className="mb-2 block text-sm font-semibold text-stone-700">
-                  Review title
+                  {language === "fr" ? "Titre de l'avis" : "Review title"}
                 </label>
                 <input
                   name="title"
@@ -215,11 +261,13 @@ export default function ReviewsExplorer({
               </div>
               <div>
                 <label className="mb-2 block text-sm font-semibold text-stone-700">
-                  Stay label
+                  {language === "fr" ? "Repere du sejour" : "Stay label"}
                 </label>
                 <input
                   name="stayLabel"
-                  placeholder="Example: February 2026"
+                  placeholder={
+                    language === "fr" ? "Exemple : fevrier 2026" : "Example: February 2026"
+                  }
                   className="w-full rounded-[1.2rem] border border-[var(--line)] bg-white px-4 py-3"
                 />
               </div>
@@ -227,7 +275,7 @@ export default function ReviewsExplorer({
 
             <div>
               <label className="mb-2 block text-sm font-semibold text-stone-700">
-                Review
+                {language === "fr" ? "Avis" : "Review"}
               </label>
               <textarea
                 name="body"
@@ -235,6 +283,43 @@ export default function ReviewsExplorer({
                 required
                 className="w-full rounded-[1.2rem] border border-[var(--line)] bg-white px-4 py-3"
               />
+            </div>
+
+            <div>
+              <label className="mb-2 block text-sm font-semibold text-stone-700">
+                {language === "fr" ? "Photos du sejour" : "Stay photos"}
+              </label>
+              <div className="rounded-[1.2rem] border border-[var(--line)] bg-white px-4 py-4">
+                <input
+                  type="file"
+                  name="photos"
+                  multiple
+                  accept="image/*"
+                  onChange={(event) =>
+                    setPhotoNames(
+                      Array.from(event.currentTarget.files ?? []).map((file) => file.name)
+                    )
+                  }
+                  className="w-full text-sm text-stone-700"
+                />
+                <p className="mt-2 text-xs leading-6 text-stone-500">
+                  {language === "fr"
+                    ? "Optionnel. Jusqu'a 4 images, 5 Mo chacune."
+                    : "Optional. Up to 4 images, 5 MB each."}
+                </p>
+                {photoNames.length > 0 ? (
+                  <div className="mt-3 flex flex-wrap gap-2">
+                    {photoNames.map((name) => (
+                      <span
+                        key={name}
+                        className="rounded-full bg-[rgba(86,112,71,0.12)] px-3 py-1 text-xs font-semibold text-[var(--accent-dark)]"
+                      >
+                        {name}
+                      </span>
+                    ))}
+                  </div>
+                ) : null}
+              </div>
             </div>
 
             {error ? (
@@ -252,7 +337,13 @@ export default function ReviewsExplorer({
               disabled={isPending}
               className="rounded-full bg-[var(--accent-dark)] px-6 py-3 font-semibold text-white transition hover:bg-[var(--accent)] disabled:cursor-not-allowed disabled:opacity-70"
             >
-              {isPending ? "Saving review..." : "Publish review"}
+              {isPending
+                ? language === "fr"
+                  ? "Enregistrement..."
+                  : "Saving review..."
+                : language === "fr"
+                  ? "Publier l'avis"
+                  : "Publish review"}
             </button>
           </form>
         </div>
@@ -265,22 +356,29 @@ export default function ReviewsExplorer({
                 "linear-gradient(180deg, rgba(24, 18, 14, 0.26), rgba(24, 18, 14, 0.56)), url('https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1600&q=80')",
             }}
           >
-            <p className="eyebrow text-[#f6d6a9]">Guestbook mood</p>
+            <p className="eyebrow text-[#f6d6a9]">
+              {language === "fr" ? "Ambiance du livre d'or" : "Guestbook mood"}
+            </p>
             <h3 className="font-heading mt-3 text-4xl font-semibold">
-              The best stays are felt twice.
+              {language === "fr"
+                ? "Les meilleurs sejours se ressentent deux fois."
+                : "The best stays are felt twice."}
             </h3>
             <p className="mt-4 max-w-xl text-sm leading-7 text-stone-100">
-              Once while you are there, and once again when someone else reads
-              about the quiet lake air, the warm lights, and the slower pace.
+              {language === "fr"
+                ? "Une premiere fois sur place, puis encore lorsqu'une autre personne lit l'histoire du calme, des lumieres chaudes et du rythme plus lent."
+                : "Once while you are there, and once again when someone else reads about the quiet lake air, the warm lights, and the slower pace."}
             </p>
           </div>
 
           <div className="rounded-[2rem] bg-[var(--pine)] p-7 text-white">
-            <p className="eyebrow text-[#d6c5a8]">At a glance</p>
+            <p className="eyebrow text-[#d6c5a8]">
+              {language === "fr" ? "En bref" : "At a glance"}
+            </p>
             <div className="mt-5 grid gap-4 sm:grid-cols-2">
               <div className="rounded-[1.5rem] border border-white/12 bg-white/8 px-4 py-4">
                 <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[#ead6b5]">
-                  Published reviews
+                  {language === "fr" ? "Avis publies" : "Published reviews"}
                 </p>
                 <p className="font-heading mt-3 text-4xl font-semibold text-[#f7e7cd]">
                   {reviews.length}
@@ -288,7 +386,7 @@ export default function ReviewsExplorer({
               </div>
               <div className="rounded-[1.5rem] border border-white/12 bg-white/8 px-4 py-4">
                 <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[#ead6b5]">
-                  Average rating
+                  {language === "fr" ? "Note moyenne" : "Average rating"}
                 </p>
                 <p className="font-heading mt-3 text-4xl font-semibold text-[#f7e7cd]">
                   {averageRating}
@@ -296,15 +394,16 @@ export default function ReviewsExplorer({
               </div>
             </div>
             <p className="mt-5 text-sm leading-7 text-stone-100">
-              Imported Airbnb reviews and direct guest notes can live together
-              here so the page feels full, honest, and personal.
+              {language === "fr"
+                ? "Les avis importes d'Airbnb et les messages directs peuvent cohabiter ici pour une page plus riche, sincere et personnelle."
+                : "Imported Airbnb reviews and direct guest notes can live together here so the page feels full, honest, and personal."}
             </p>
             {importHref ? (
               <Link
                 href={importHref}
                 className="mt-5 inline-block text-sm font-semibold text-[#f7e7cd] transition hover:text-white"
               >
-                Owner import tool
+                {language === "fr" ? "Outil d'import proprietaire" : "Owner import tool"}
               </Link>
             ) : null}
           </div>
@@ -314,25 +413,36 @@ export default function ReviewsExplorer({
       <section className="panel rounded-[2rem] p-6 md:p-7">
         <div className="flex flex-col gap-5 md:flex-row md:items-end md:justify-between">
           <div>
-            <p className="eyebrow">Current reviews</p>
+            <p className="eyebrow">{language === "fr" ? "Avis actuels" : "Current reviews"}</p>
             <h2 className="font-heading mt-2 text-3xl font-semibold text-[var(--accent-dark)]">
-              Read through the guest stories
+              {language === "fr"
+                ? "Parcourez les histoires de sejour"
+                : "Read through the guest stories"}
             </h2>
           </div>
           <p className="text-sm font-semibold text-stone-500">
-            {filteredReviews.length} result{filteredReviews.length === 1 ? "" : "s"}
+            {filteredReviews.length}{" "}
+            {language === "fr"
+              ? filteredReviews.length === 1
+                ? "resultat"
+                : "resultats"
+              : `result${filteredReviews.length === 1 ? "" : "s"}`}
           </p>
         </div>
 
         <div className="mt-6 grid gap-4 lg:grid-cols-4">
           <div className="lg:col-span-4">
             <label className="mb-2 block text-sm font-semibold text-stone-700">
-              Search reviews
+              {language === "fr" ? "Rechercher dans les avis" : "Search reviews"}
             </label>
             <input
               value={search}
               onChange={(event) => setSearch(event.target.value)}
-              placeholder="Search by cabin, guest, title, or keyword"
+              placeholder={
+                language === "fr"
+                  ? "Rechercher par chalet, voyageur, titre ou mot-cle"
+                  : "Search by cabin, guest, title, or keyword"
+              }
               className="w-full rounded-[1.2rem] border border-[var(--line)] bg-white px-4 py-3"
             />
           </div>
@@ -345,36 +455,36 @@ export default function ReviewsExplorer({
               onChange={(event) => setSourceFilter(event.target.value)}
               className="w-full rounded-[1.2rem] border border-[var(--line)] bg-white px-4 py-3"
             >
-              <option value="all">All sources</option>
+              <option value="all">{language === "fr" ? "Toutes les sources" : "All sources"}</option>
               <option value="airbnb">Airbnb</option>
-              <option value="direct">Guest reviews</option>
+              <option value="direct">{language === "fr" ? "Avis directs" : "Guest reviews"}</option>
             </select>
           </div>
           <div>
             <label className="mb-2 block text-sm font-semibold text-stone-700">
-              Rating
+              {language === "fr" ? "Note" : "Rating"}
             </label>
             <select
               value={ratingFilter}
               onChange={(event) => setRatingFilter(event.target.value)}
               className="w-full rounded-[1.2rem] border border-[var(--line)] bg-white px-4 py-3"
             >
-              <option value="all">Any rating</option>
-              <option value="5">5 stars</option>
-              <option value="4">4 stars and up</option>
-              <option value="3">3 stars and up</option>
+              <option value="all">{language === "fr" ? "Toutes les notes" : "Any rating"}</option>
+              <option value="5">{language === "fr" ? "5 etoiles" : "5 stars"}</option>
+              <option value="4">{language === "fr" ? "4 etoiles et plus" : "4 stars and up"}</option>
+              <option value="3">{language === "fr" ? "3 etoiles et plus" : "3 stars and up"}</option>
             </select>
           </div>
           <div className="lg:col-span-2">
             <label className="mb-2 block text-sm font-semibold text-stone-700">
-              Cabin
+              {language === "fr" ? "Chalet" : "Cabin"}
             </label>
             <select
               value={cabinFilter}
               onChange={(event) => setCabinFilter(event.target.value)}
               className="w-full rounded-[1.2rem] border border-[var(--line)] bg-white px-4 py-3"
             >
-              <option value="all">All cabins</option>
+              <option value="all">{language === "fr" ? "Tous les chalets" : "All cabins"}</option>
               {cabins.map((cabin) => (
                 <option key={cabin.id} value={cabin.id}>
                   {cabin.name}
@@ -399,12 +509,12 @@ export default function ReviewsExplorer({
                       </p>
                       {review.source === "airbnb" ? (
                         <span className="rounded-full bg-[rgba(86,112,71,0.12)] px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-[var(--accent-dark)]">
-                          From Airbnb
+                          {language === "fr" ? "Depuis Airbnb" : "From Airbnb"}
                         </span>
                       ) : null}
                     </div>
                     <p className="mt-2 text-sm font-medium text-stone-500">
-                      {getReviewAuthor(review)}
+                      {getReviewAuthor(review, language)}
                       {review.reviewerLocation ? `, ${review.reviewerLocation}` : ""}
                       {review.cabinName ? ` - ${review.cabinName}` : ""}
                     </p>
@@ -417,19 +527,32 @@ export default function ReviewsExplorer({
                   </div>
                 </div>
                 <p className="mt-4 text-sm leading-7 text-stone-700">{review.body}</p>
+                {review.imageUrls.length > 0 ? (
+                  <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                    {review.imageUrls.map((url) => (
+                      <div
+                        key={url}
+                        className="h-40 rounded-[1.4rem] bg-cover bg-center"
+                        style={{ backgroundImage: `url('${url}')` }}
+                      />
+                    ))}
+                  </div>
+                ) : null}
                 {review.cabinSlug ? (
                   <Link
                     href={`/cabins/${review.cabinSlug}`}
                     className="mt-4 inline-block text-sm font-semibold text-[var(--accent)] transition hover:text-[var(--accent-dark)]"
                   >
-                    Explore this cabin
+                    {language === "fr" ? "Explorer ce chalet" : "Explore this cabin"}
                   </Link>
                 ) : null}
               </article>
             ))
           ) : (
             <div className="soft-ring rounded-[1.6rem] bg-white/72 p-6 text-sm leading-7 text-stone-700">
-              No reviews match the current filters yet.
+              {language === "fr"
+                ? "Aucun avis ne correspond aux filtres pour le moment."
+                : "No reviews match the current filters yet."}
             </div>
           )}
         </div>

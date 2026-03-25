@@ -1,6 +1,7 @@
 import Link from "next/link";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import { LocalizedText } from "@/components/LanguageProvider";
 import { getAllCabins } from "@/lib/cabins";
 
 export const dynamic = "force-dynamic";
@@ -24,14 +25,20 @@ export default async function CabinsPage() {
 
       <section className="px-6 pb-8 pt-8">
         <div className="mx-auto max-w-7xl rounded-[2rem] border border-[var(--line)] bg-white/55 px-7 py-10 md:px-10">
-          <p className="eyebrow">Cabin collection</p>
+          <p className="eyebrow">
+            <LocalizedText en="Cabin collection" fr="Collection de chalets" />
+          </p>
           <h1 className="font-heading mt-3 text-5xl font-semibold text-[var(--accent-dark)]">
-            Browse every chalet and find the right atmosphere for your guests.
+            <LocalizedText
+              en="Browse every chalet and find the right atmosphere for your guests."
+              fr="Parcourez chaque chalet et trouvez l'atmosphere ideale pour vos voyageurs."
+            />
           </h1>
           <p className="mt-5 max-w-3xl text-base leading-7 text-stone-700">
-            Each cabin has its own page with visuals, amenities, and a direct
-            reservation path. This keeps the browsing experience clear while still
-            feeling warm and premium.
+            <LocalizedText
+              en="Each cabin has its own page with visuals, amenities, and a direct reservation path. This keeps the browsing experience clear while still feeling warm and premium."
+              fr="Chaque chalet a sa propre page avec visuels, commodites et acces direct a la reservation. L'experience reste claire, chaleureuse et soignee."
+            />
           </p>
         </div>
       </section>
@@ -54,9 +61,24 @@ export default async function CabinsPage() {
               <div className="grid gap-6 p-7 md:grid-cols-[1fr_auto] md:items-end">
                 <div>
                   <div className="flex flex-wrap gap-2 text-xs font-semibold uppercase tracking-[0.24em] text-stone-500">
-                    <span>{cabin.guests} guests</span>
-                    <span>{cabin.bedrooms} bedrooms</span>
-                    <span>{cabin.bathrooms} bathrooms</span>
+                    <span>
+                      <LocalizedText
+                        en={`${cabin.guests} guests`}
+                        fr={`${cabin.guests} voyageurs`}
+                      />
+                    </span>
+                    <span>
+                      <LocalizedText
+                        en={`${cabin.bedrooms} bedrooms`}
+                        fr={`${cabin.bedrooms} chambres`}
+                      />
+                    </span>
+                    <span>
+                      <LocalizedText
+                        en={`${cabin.bathrooms} bathrooms`}
+                        fr={`${cabin.bathrooms} salles de bain`}
+                      />
+                    </span>
                   </div>
                   <h2 className="font-heading mt-4 text-4xl font-semibold text-[var(--accent-dark)]">
                     {cabin.name}
@@ -71,13 +93,16 @@ export default async function CabinsPage() {
 
                 <div className="space-y-4 md:text-right">
                   <p className="text-sm font-semibold text-[var(--pine)]">
-                    Starting from {cabin.price}
+                    <LocalizedText
+                      en={`Starting from ${cabin.price}`}
+                      fr={`A partir de ${cabin.price}`}
+                    />
                   </p>
                   <Link
                     href={`/cabins/${cabin.slug}`}
                     className="inline-block rounded-full bg-[var(--accent-dark)] px-5 py-3 text-sm font-semibold text-white transition hover:bg-[var(--accent)]"
                   >
-                    Open detail page
+                    <LocalizedText en="Open detail page" fr="Voir la page detaillee" />
                   </Link>
                 </div>
               </div>
