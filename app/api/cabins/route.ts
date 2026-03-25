@@ -39,39 +39,92 @@ export async function POST(req: Request) {
   );
 
   try {
-    await prisma.cabin.create({
-      data: {
-        name,
-        slug,
-        address,
-        description,
-        descriptionFr: descriptionFr || null,
-        price,
-        guests,
-        bedrooms,
-        bathrooms,
-        ...amenities,
-        images: {
-          create: mediaState.flatMap((item, index) => {
-            if (item.kind !== "new") {
-              return [];
-            }
+    const createdCabins = await prisma.$queryRaw<Array<{ id: string }>>`
+      INSERT INTO "Cabin" (
+        "name",
+        "slug",
+        "address",
+        "description",
+        "descriptionFr",
+        "price",
+        "guests",
+        "bedrooms",
+        "bathrooms",
+        "wifi",
+        "hotTub",
+        "lakeAccess",
+        "fireplace",
+        "bbq",
+        "airConditioning",
+        "fullKitchen",
+        "washerDryer",
+        "workspace",
+        "petFriendly",
+        "selfCheckIn",
+        "freeParking",
+        "featured",
+        "createdAt",
+        "updatedAt"
+      )
+      VALUES (
+        ${name},
+        ${slug},
+        ${address},
+        ${description},
+        ${descriptionFr || null},
+        ${price},
+        ${guests},
+        ${bedrooms},
+        ${bathrooms},
+        ${amenities.wifi},
+        ${amenities.hotTub},
+        ${amenities.lakeAccess},
+        ${amenities.fireplace},
+        ${amenities.bbq},
+        ${amenities.airConditioning},
+        ${amenities.fullKitchen},
+        ${amenities.washerDryer},
+        ${amenities.workspace},
+        ${amenities.petFriendly},
+        ${amenities.selfCheckIn},
+        ${amenities.freeParking},
+        false,
+        NOW(),
+        NOW()
+      )
+      RETURNING "id"
+    `;
 
-            const uploaded = uploadedMedia[item.fileIndex];
-            if (!uploaded) {
-              return [];
-            }
+    const cabinId = createdCabins[0]?.id;
 
-            return {
-              url: uploaded.url,
-              mediaType: uploaded.mediaType,
-              isHero: item.isHero && uploaded.mediaType === "image",
-              position: index,
-            };
-          }),
-        },
-      },
+    if (!cabinId) {
+      throw new Error("Cabin could not be created.");
+    }
+
+    const newMedia = mediaState.flatMap((item, index) => {
+      if (item.kind !== "new") {
+        return [];
+      }
+
+      const uploaded = uploadedMedia[item.fileIndex];
+      if (!uploaded) {
+        return [];
+      }
+
+      return {
+        url: uploaded.url,
+        mediaType: uploaded.mediaType,
+        isHero: item.isHero && uploaded.mediaType === "image",
+        position: index,
+        cabinId,
+      };
     });
+
+    if (newMedia.length > 0) {
+      await prisma.cabinImage.createMany({
+        data: newMedia,
+      });
+    }
   } catch (error) {
     if (isDatabaseConnectionError(error)) {
       return NextResponse.redirect(new URL("/admin/cabins/new?error=db", req.url), {

@@ -41,14 +41,14 @@ export default async function ContactPage({
             />
             <h1 className="font-heading mt-3 text-5xl font-semibold text-white">
               <LocalizedText
-                en="Send your preferred dates and we will follow up directly."
-                fr="Envoyez vos dates preferees et nous ferons le suivi directement."
+                en="Send your preferred dates and start the conversation directly with us."
+                fr="Envoyez vos dates preferees et commencez la conversation directement avec nous."
               />
             </h1>
             <p className="mt-5 text-sm leading-7 text-stone-100">
               <LocalizedText
-                en="Feel free to send a message for any inquiries, and we will answer as fast as possible."
-                fr="N'hesitez pas a envoyer un message pour toute question, et nous repondrons aussi rapidement que possible."
+                en="Ask about availability, group size, amenities, or anything else you would like to know before booking."
+                fr="Posez vos questions sur les disponibilites, la taille du groupe, les commodites ou tout autre detail utile avant de reserver."
               />
             </p>
 
@@ -68,13 +68,13 @@ export default async function ContactPage({
                     </svg>
                   </span>
                   <p className="text-xs font-semibold uppercase tracking-[0.22em] text-stone-200">
-                    <LocalizedText en="What we collect" fr="Ce que nous recueillons" />
+                    <LocalizedText en="What to include" fr="A inclure" />
                   </p>
                 </div>
                 <p className="mt-2 text-sm leading-6 text-stone-100">
                   <LocalizedText
-                    en="Name, email, phone number, interested chalet, ideal dates, and any extra comments."
-                    fr="Nom, courriel, numero de telephone, chalet souhaite, dates ideales et tout commentaire utile."
+                    en="Your contact details, the cabin you want, your ideal dates, and any helpful notes about the stay."
+                    fr="Vos coordonnees, le chalet souhaite, vos dates ideales et toute note utile concernant le sejour."
                   />
                 </p>
               </div>
@@ -94,8 +94,8 @@ export default async function ContactPage({
                 </div>
                 <p className="mt-2 text-sm leading-6 text-stone-100">
                   <LocalizedText
-                    en="A direct booking workflow without marketplace commissions."
-                    fr="Un parcours de reservation directe sans commissions de plateforme."
+                    en="Guests who prefer direct planning, clear communication, and a simpler booking path."
+                    fr="Les voyageurs qui preferent une planification directe, une communication claire et un parcours de reservation plus simple."
                   />
                 </p>
               </div>
@@ -114,13 +114,13 @@ export default async function ContactPage({
                     </svg>
                   </span>
                   <p className="text-xs font-semibold uppercase tracking-[0.22em] text-stone-200">
-                    <LocalizedText en="Response time" fr="Delai de reponse" />
+                    <LocalizedText en="What happens next" fr="Et ensuite" />
                   </p>
                 </div>
                 <p className="mt-2 text-sm leading-6 text-stone-100">
                   <LocalizedText
-                    en="Send us your preferred dates, special requests, or questions about the chalet, and we will reply as quickly as possible."
-                    fr="Envoyez vos dates preferees, vos demandes speciales ou vos questions sur le chalet, et nous repondrons le plus vite possible."
+                    en="We review your request, confirm availability, and follow up with the next steps as quickly as possible."
+                    fr="Nous examinons votre demande, confirmons les disponibilites et revenons vers vous avec la suite aussi rapidement que possible."
                   />
                 </p>
               </div>
@@ -231,11 +231,16 @@ export default async function ContactPage({
                 />
               </div>
 
-              <button className="rounded-full bg-[var(--accent-dark)] px-6 py-3 font-semibold text-white transition hover:bg-[var(--accent)]">
-                <LocalizedText
-                  en="Send reservation request"
-                  fr="Envoyer la demande de reservation"
-                />
+              <button
+                className="rounded-full bg-[var(--accent-dark)] px-6 py-3 font-semibold text-white transition hover:bg-[var(--accent)]"
+                style={{ color: "#ffffff" }}
+              >
+                <span className="text-white">
+                  <LocalizedText
+                    en="Send reservation request"
+                    fr="Envoyer la demande de reservation"
+                  />
+                </span>
               </button>
             </form>
           </div>

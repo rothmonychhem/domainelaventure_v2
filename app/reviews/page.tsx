@@ -21,19 +21,19 @@ export default async function ReviewsPage() {
 
       <section className="px-6 pb-8 pt-8">
         <div className="mx-auto max-w-7xl rounded-[2rem] border border-[var(--line)] bg-white/55 px-7 py-10 md:px-10">
-          <p className="eyebrow">
-            <LocalizedText en="Guest reviews" fr="Avis voyageurs" />
-          </p>
-          <h1 className="font-heading mt-3 text-5xl font-semibold text-[var(--accent-dark)]">
+          <p className="text-sm font-semibold uppercase tracking-[0.22em] text-stone-500">
             <LocalizedText
               en="A warm guestbook for every stay and every cabin."
               fr="Un livre d'or chaleureux pour chaque sejour et chaque chalet."
             />
+          </p>
+          <h1 className="font-heading mt-3 text-6xl font-semibold text-[var(--accent-dark)] md:text-7xl">
+            <LocalizedText en="Guest reviews" fr="Avis voyageurs" />
           </h1>
           <p className="mt-5 max-w-3xl text-base leading-7 text-stone-700">
             <LocalizedText
-              en="Guests can leave a note, read through past stays, and explore what each cabin feels like through real feedback."
-              fr="Les voyageurs peuvent laisser un mot, lire les sejours passes et decouvrir l'ambiance de chaque chalet a travers de vrais avis."
+              en="Feel free to leave a note and share your experience so other guests can discover the kind of amazing moments that make a cabin stay special."
+              fr="N'hesitez pas a laisser un mot et a partager votre experience pour aider les autres voyageurs a decouvrir les beaux moments qui rendent un sejour en chalet si special."
             />
           </p>
         </div>

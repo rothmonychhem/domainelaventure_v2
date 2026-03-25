@@ -82,8 +82,8 @@ export default function FeaturedCabinsSlideshow({
               </span>
               <span className="rounded-full border border-white/20 bg-white/10 px-4 py-2 backdrop-blur-sm">
                 {language === "fr"
-                  ? `A partir de ${activeCabin.price}`
-                  : `Starting from ${activeCabin.price}`}
+                  ? `A partir de $${activeCabin.price} / nuit`
+                  : `Starting from $${activeCabin.price} / night`}
               </span>
             </div>
 

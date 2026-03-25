@@ -43,21 +43,33 @@ export async function POST(
   );
 
   try {
-    await prisma.cabin.update({
-      where: { id },
-      data: {
-        name,
-        slug,
-        address,
-        description,
-        descriptionFr: descriptionFr || null,
-        price,
-        guests,
-        bedrooms,
-        bathrooms,
-        ...amenities,
-      },
-    });
+    await prisma.$executeRaw`
+      UPDATE "Cabin"
+      SET
+        "name" = ${name},
+        "slug" = ${slug},
+        "address" = ${address},
+        "description" = ${description},
+        "descriptionFr" = ${descriptionFr || null},
+        "price" = ${price},
+        "guests" = ${guests},
+        "bedrooms" = ${bedrooms},
+        "bathrooms" = ${bathrooms},
+        "wifi" = ${amenities.wifi},
+        "hotTub" = ${amenities.hotTub},
+        "lakeAccess" = ${amenities.lakeAccess},
+        "fireplace" = ${amenities.fireplace},
+        "bbq" = ${amenities.bbq},
+        "airConditioning" = ${amenities.airConditioning},
+        "fullKitchen" = ${amenities.fullKitchen},
+        "washerDryer" = ${amenities.washerDryer},
+        "workspace" = ${amenities.workspace},
+        "petFriendly" = ${amenities.petFriendly},
+        "selfCheckIn" = ${amenities.selfCheckIn},
+        "freeParking" = ${amenities.freeParking},
+        "updatedAt" = NOW()
+      WHERE "id" = ${id}
+    `;
 
     const existingMedia = mediaState
       .filter((item): item is { kind: "existing"; id: string; isHero: boolean } => item.kind === "existing")

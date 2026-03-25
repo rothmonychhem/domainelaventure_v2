@@ -24,7 +24,10 @@ function isDatabaseUnavailable(error: unknown) {
     message.includes("can't reach database server") ||
     message.includes("invalid datasource") ||
     message.includes("accelerate") ||
-    message.includes("direct_database_url or database_url must be set")
+    message.includes("direct_database_url or database_url must be set") ||
+    message.includes("column") && message.includes("does not exist") ||
+    message.includes("relation") && message.includes("does not exist") ||
+    message.includes("unknown field")
   );
 }
 

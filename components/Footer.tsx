@@ -18,8 +18,8 @@ export default function Footer() {
           </h2>
           <p className="mt-3 text-sm leading-6 text-stone-300">
             {language === "fr"
-              ? "Concu pour une petite entreprise de chalets avec une administration simple, un hebergement a faible cout et des demandes de reservation directes."
-              : "Built for a small chalet business with a simple admin, low-cost hosting, and direct reservation requests."}
+              ? "Des chalets pensés pour se retrouver, profiter de la nature et creer de beaux souvenirs en famille ou entre proches."
+              : "Cabin stays made for family time, nature, and simple moments worth sharing together."}
           </p>
         </div>
 

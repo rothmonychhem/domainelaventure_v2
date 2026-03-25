@@ -8,19 +8,10 @@ import { getAllCabins } from "@/lib/cabins";
 
 export const dynamic = "force-dynamic";
 
-const highlights = [
-  {
-    en: "Direct reservation requests with no marketplace fees",
-    fr: "Demandes de reservation directes sans frais de plateforme",
-  },
-  {
-    en: "Owner/dev login hidden in the footer for lightweight management",
-    fr: "Connexion proprietaire/dev discretement placee dans le pied de page pour une gestion legere",
-  },
-  {
-    en: "Cabin detail pages with galleries, amenities, and clear calls to reserve",
-    fr: "Pages detaillees pour chaque chalet avec galerie, commodites et reservation claire",
-  },
+const quickLinks = [
+  { href: "/cabins", en: "See cabins", fr: "Voir les chalets" },
+  { href: "/reviews", en: "Read reviews", fr: "Lire les avis" },
+  { href: "/contract", en: "View contract", fr: "Voir le contrat" },
 ];
 
 function getCabinCardImage(
@@ -65,18 +56,18 @@ export default async function HomePage() {
           >
             <div className="relative flex h-full max-w-2xl flex-col justify-end text-white">
               <p className="eyebrow text-[#f8d7a7]">
-                <LocalizedText en="Forest calm, elevated" fr="Calme de la foret, raffine" />
+                <LocalizedText en="Domaine l Aventure" fr="Domaine l Aventure" />
               </p>
               <h1 className="section-title mt-4 max-w-3xl text-white">
                 <LocalizedText
-                  en="Cozy chalet stays with a warmer, more memorable brand presence."
-                  fr="Des sejours en chalet plus chaleureux, avec une presence de marque plus elegante et memorable."
+                  en="Spend quality time with family, nature, and slower moments that feel worth remembering."
+                  fr="Passez de beaux moments en famille, au coeur de la nature, et profitez d'un rythme plus doux qui laisse de vrais souvenirs."
                 />
               </h1>
               <p className="mt-6 max-w-xl text-base leading-7 text-stone-100 md:text-lg">
                 <LocalizedText
-                  en="Domaine Aventure helps guests discover your cabins, explore each chalet in detail, and send reservation requests directly to you."
-                  fr="Domaine Aventure aide les voyageurs a decouvrir vos chalets, explorer chaque sejour en detail et envoyer une demande de reservation directement."
+                  en="Discover cozy chalets, peaceful surroundings, and direct booking for a warm and simple getaway."
+                  fr="Decouvrez des chalets chaleureux, des paysages paisibles et une reservation directe pour une escapade simple et memorable."
                 />
               </p>
               <div className="mt-8 flex flex-col gap-4 sm:flex-row">
@@ -91,8 +82,8 @@ export default async function HomePage() {
                   className="rounded-full border border-white/50 px-6 py-3 text-center font-semibold text-white transition hover:bg-white hover:text-[var(--accent-dark)]"
                 >
                   <LocalizedText
-                    en="Request a reservation"
-                    fr="Demander une reservation"
+                    en="Plan your stay"
+                    fr="Planifier votre sejour"
                   />
                 </Link>
               </div>
@@ -103,29 +94,29 @@ export default async function HomePage() {
             <div className="panel rounded-[2rem] p-7 md:p-8">
               <SectionAccent
                 icon="spark"
-                label={
-                  <LocalizedText
-                    en="Why this setup works"
-                    fr="Pourquoi cette approche fonctionne"
-                  />
-                }
+                label={<LocalizedText en="Quick links" fr="Liens rapides" />}
               />
               <div className="mt-5 space-y-4">
-                {highlights.map((item) => (
-                  <div
-                    key={item.en}
-                    className="soft-ring flex items-start gap-3 rounded-[1.5rem] bg-white/70 px-4 py-4 text-sm leading-6 text-stone-700"
+                {quickLinks.map((item) => (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    className="soft-ring flex items-start gap-3 rounded-[1.5rem] bg-white/70 px-4 py-4 text-sm font-semibold leading-6 text-stone-700 transition hover:bg-white"
                   >
                     <span className="mt-0.5 inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[rgba(239,229,206,0.9)] text-[var(--accent-dark)]">
                       <svg viewBox="0 0 24 24" className="h-4 w-4" aria-hidden="true">
                         <path
-                          d="m12 4.3 1.5 4.2 4.2 1.5-4.2 1.5-1.5 4.2-1.5-4.2-4.2-1.5 4.2-1.5L12 4.3Z"
-                          fill="currentColor"
+                          d="M7 12h10m0 0-4-4m4 4-4 4"
+                          stroke="currentColor"
+                          strokeWidth="1.8"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          fill="none"
                         />
                       </svg>
                     </span>
                     <LocalizedText en={item.en} fr={item.fr} />
-                  </div>
+                  </Link>
                 ))}
               </div>
             </div>
@@ -133,19 +124,19 @@ export default async function HomePage() {
             <div className="panel rounded-[2rem] p-7 md:p-8">
               <SectionAccent
                 icon="mail"
-                label={<LocalizedText en="Reservation flow" fr="Parcours de reservation" />}
+                label={<LocalizedText en="Reservation" fr="Reservation" />}
               />
               <div className="mt-4 space-y-4 text-sm leading-6 text-stone-700">
                 <p>
                   <LocalizedText
-                    en="Guests choose a cabin, review the details page, and submit a request with their dates and comments."
-                    fr="Les voyageurs choisissent un chalet, consultent la page detaillee et envoient une demande avec leurs dates et commentaires."
+                    en="Find your perfect dream vacation cabin, fill out the form, and we will contact you as fast as possible."
+                    fr="Trouvez le chalet ideal pour vos vacances, remplissez le formulaire et nous vous contacterons le plus rapidement possible."
                   />
                 </p>
                 <p>
                   <LocalizedText
-                    en="Each request is saved in the database and can notify you by email, with optional SMS if you later connect Twilio."
-                    fr="Chaque demande est enregistree et peut vous avertir par courriel, avec des SMS en option si vous connectez Twilio plus tard."
+                    en="It is a simple and direct way to ask about dates, availability, and the kind of stay you have in mind."
+                    fr="C'est une facon simple et directe de demander des dates, des disponibilites et le type de sejour que vous imaginez."
                   />
                 </p>
               </div>
@@ -183,22 +174,25 @@ export default async function HomePage() {
                   <div>
                     <p className="font-heading text-3xl font-semibold text-[var(--accent-dark)]">
                       <LocalizedText
-                        en="The first hero now carries the page."
-                        fr="Le grand visuel principal porte maintenant la page."
+                        en="Your featured cabins will appear here."
+                        fr="Vos chalets en vedette apparaitront ici."
                       />
                     </p>
                     <p className="mt-3 max-w-2xl text-sm leading-7 text-stone-700">
                       <LocalizedText
-                        en="No cabins are published yet, so this area stays quiet until you add one from the admin side."
-                        fr="Aucun chalet n'est encore publie, donc cette zone reste sobre jusqu'a ce que vous en ajoutiez un depuis l'administration."
+                        en="Add your first cabin from the admin dashboard to start building the public collection and reservation flow."
+                        fr="Ajoutez votre premier chalet depuis l'administration pour lancer la collection publique et le parcours de reservation."
                       />
                     </p>
                   </div>
                   <Link
                     href="/admin"
-                    className="rounded-full bg-[var(--accent-dark)] px-5 py-3 text-center text-sm font-semibold text-white transition hover:bg-[var(--accent)]"
+                    className="rounded-full bg-[var(--accent-dark)] px-5 py-3 text-center text-sm font-semibold text-white transition hover:bg-[var(--accent)] hover:text-white visited:text-white"
+                    style={{ color: "#ffffff" }}
                   >
-                    <LocalizedText en="Go to admin" fr="Aller a l'administration" />
+                    <span className="text-white">
+                      <LocalizedText en="Go to admin" fr="Aller a l'administration" />
+                    </span>
                   </Link>
                 </div>
               </div>
@@ -213,26 +207,26 @@ export default async function HomePage() {
         <div className="mx-auto grid max-w-7xl gap-6 rounded-[2rem] bg-[var(--pine)] px-7 py-10 text-white md:grid-cols-[0.95fr_1.05fr] md:px-10">
           <div>
             <p className="eyebrow text-[#d6c5a8]">
-              <LocalizedText en="Low-cost friendly" fr="Pensé pour rester abordable" />
+              <LocalizedText en="Great family time" fr="Beaux moments en famille" />
             </p>
             <h2 className="font-heading mt-3 text-4xl font-semibold text-[#f7e7cd]">
               <LocalizedText
-                en="Built to stay simple to manage."
-                fr="Concu pour rester simple a gerer."
+                en="The best cabin trips are often the simplest ones."
+                fr="Les plus beaux sejours en chalet sont souvent les plus simples."
               />
             </h2>
           </div>
           <div className="space-y-4 text-sm leading-7 text-stone-100">
             <p>
               <LocalizedText
-                en="This structure keeps things efficient: static pages, direct forms, a lightweight admin, and no unnecessary subscription-heavy tools."
-                fr="Cette structure reste efficace : pages statiques, formulaires directs, administration legere et aucun outil inutilement charge en abonnements."
+                en="Think long breakfasts, card games by the table, quiet walks, stories by the fire, and evenings spent together without rushing."
+                fr="Pensez aux longs dejeuners, aux jeux de cartes autour de la table, aux promenades tranquilles, aux histoires pres du feu et aux soirees sans se presser."
               />
             </p>
             <p>
               <LocalizedText
-                en="If you want, we can next connect your real branding, add more cabin content, and plug in your notification credentials."
-                fr="Si vous le souhaitez, nous pouvons ensuite connecter votre vraie image de marque, ajouter plus de contenu et brancher vos identifiants de notification."
+                en="A chalet stay is often about reconnecting: fresh air, slower mornings, good meals, and more time with the people you came with."
+                fr="Un sejour en chalet, c'est souvent l'occasion de se retrouver : de l'air frais, des matins plus doux, de bons repas et davantage de temps avec ceux qui vous accompagnent."
               />
             </p>
             <div className="pt-2">
@@ -240,8 +234,8 @@ export default async function HomePage() {
                 icon="pine"
                 label={
                   <LocalizedText
-                    en="Simple setup, warm guest feel"
-                    fr="Mise en place simple, ambiance chaleureuse"
+                    en="Nature, comfort, family time"
+                    fr="Nature, confort, temps en famille"
                   />
                 }
                 inverted

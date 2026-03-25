@@ -23,6 +23,14 @@ export default async function AdminPage() {
   }
 
   const cabins = await getAllCabins();
+  const featuredCabins = cabins.filter((cabin) => cabin.featured).length;
+  const cabinsWithHeroImage = cabins.filter((cabin) =>
+    cabin.images.some((image) => image.mediaType === "image" && image.isHero)
+  ).length;
+  const totalMediaItems = cabins.reduce(
+    (count, cabin) => count + cabin.images.length,
+    0
+  );
 
   return (
     <main className="shell min-h-screen px-6 py-10">
@@ -40,13 +48,6 @@ export default async function AdminPage() {
             </div>
 
             <div className="flex flex-wrap gap-3">
-              {session.role === "owner" ? (
-                <form action="/api/cabins/mock" method="POST">
-                  <button className="rounded-full border border-[var(--line)] bg-[rgba(86,112,71,0.12)] px-5 py-3 text-sm font-semibold text-[var(--accent-dark)] transition hover:bg-[rgba(86,112,71,0.2)]">
-                    Create mock cabin
-                  </button>
-                </form>
-              ) : null}
               <Link
                 href="/admin/cabins/new"
                 className="rounded-full bg-[var(--accent-dark)] px-5 py-3 text-sm font-semibold text-white transition hover:bg-[var(--accent)]"
@@ -68,61 +69,89 @@ export default async function AdminPage() {
           </div>
         </section>
 
+        <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+          <article className="panel rounded-[1.8rem] p-6">
+            <p className="text-xs font-semibold uppercase tracking-[0.22em] text-stone-500">
+              Total cabins
+            </p>
+            <p className="font-heading mt-3 text-4xl font-semibold text-[var(--accent-dark)]">
+              {cabins.length}
+            </p>
+          </article>
+          <article className="panel rounded-[1.8rem] p-6">
+            <p className="text-xs font-semibold uppercase tracking-[0.22em] text-stone-500">
+              Featured cabins
+            </p>
+            <p className="font-heading mt-3 text-4xl font-semibold text-[var(--accent-dark)]">
+              {featuredCabins}
+            </p>
+          </article>
+          <article className="panel rounded-[1.8rem] p-6">
+            <p className="text-xs font-semibold uppercase tracking-[0.22em] text-stone-500">
+              Hero images ready
+            </p>
+            <p className="font-heading mt-3 text-4xl font-semibold text-[var(--accent-dark)]">
+              {cabinsWithHeroImage}
+            </p>
+          </article>
+          <article className="panel rounded-[1.8rem] p-6">
+            <p className="text-xs font-semibold uppercase tracking-[0.22em] text-stone-500">
+              Media library
+            </p>
+            <p className="font-heading mt-3 text-4xl font-semibold text-[var(--accent-dark)]">
+              {totalMediaItems}
+            </p>
+          </article>
+        </section>
+
         <section className="grid gap-6 lg:grid-cols-[1.05fr_0.95fr]">
           <article className="rounded-[2rem] border border-[rgba(48,71,46,0.14)] bg-[linear-gradient(180deg,rgba(224,236,217,0.92),rgba(244,248,239,0.88))] p-7 shadow-[0_24px_60px_rgba(39,61,44,0.12)]">
-            <p className="eyebrow">Quick actions</p>
+            <p className="eyebrow">Publishing workflow</p>
             <h2 className="font-heading mt-3 text-3xl font-semibold text-[var(--accent-dark)]">
-              Test the owner flow fast
+              Keep listings polished and ready to book
             </h2>
             <p className="mt-4 max-w-2xl text-sm leading-7 text-stone-700">
-              Use a mock cabin to verify the admin dashboard, cabin list, detail
-              page, and reservation path without typing a full listing by hand.
+              Add new cabins, set strong hero images, and manage guest reviews
+              from one place so the public site always feels complete and
+              trustworthy.
             </p>
 
             <div className="mt-6 flex flex-wrap gap-3">
-              {session.role === "owner" ? (
-                <form action="/api/cabins/mock" method="POST">
-                  <button className="rounded-full bg-[var(--accent-dark)] px-6 py-3 text-sm font-semibold text-white transition hover:bg-[var(--accent)]">
-                    Create mock cabin now
-                  </button>
-                </form>
-              ) : (
-                <div className="rounded-[1.2rem] border border-[var(--line)] bg-white/70 px-4 py-3 text-sm leading-6 text-stone-700">
-                  The mock-cabin shortcut is visible only to the owner account.
-                </div>
-              )}
-
               <Link
                 href="/admin/cabins/new"
-                className="rounded-full border border-[var(--line)] bg-white/70 px-6 py-3 text-sm font-semibold text-[var(--accent-dark)] transition hover:bg-white"
+                className="rounded-full bg-[var(--accent-dark)] px-6 py-3 text-sm font-semibold text-white transition hover:bg-[var(--accent)]"
               >
-                Add a real cabin manually
+                Add a new cabin
               </Link>
               <Link
                 href="/admin/reviews"
                 className="rounded-full border border-[var(--line)] bg-white/70 px-6 py-3 text-sm font-semibold text-[var(--accent-dark)] transition hover:bg-white"
               >
-                Import Airbnb reviews
+                Manage guest reviews
+              </Link>
+              <Link
+                href="/cabins"
+                className="rounded-full border border-[var(--line)] bg-white/70 px-6 py-3 text-sm font-semibold text-[var(--accent-dark)] transition hover:bg-white"
+              >
+                View public cabins
               </Link>
             </div>
           </article>
 
           <article className="rounded-[2rem] border border-[var(--line)] bg-white/82 p-7 shadow-[0_24px_60px_rgba(39,61,44,0.1)]">
-            <p className="eyebrow">Theme update</p>
+            <p className="eyebrow">Admin notes</p>
             <h2 className="font-heading mt-3 text-3xl font-semibold text-[var(--accent-dark)]">
-              Stronger forest styling
+              Listing quality checklist
             </h2>
             <div className="mt-5 space-y-3 text-sm leading-6 text-stone-700">
               <div className="soft-ring rounded-[1.4rem] bg-[rgba(234,242,228,0.8)] px-4 py-3">
-                The beige base has been shifted greener across the whole app.
+                Use a sharp hero photo so the cabin card feels premium at first glance.
               </div>
               <div className="soft-ring rounded-[1.4rem] bg-[rgba(234,242,228,0.8)] px-4 py-3">
-                The forest photo and tree silhouette background are now much
-                more visible.
+                Keep the address, nightly price, and amenities complete before publishing.
               </div>
               <div className="soft-ring rounded-[1.4rem] bg-[rgba(234,242,228,0.8)] px-4 py-3">
-                Admin pages now sit on the same forest shell instead of plain
-                flat beige backgrounds.
+                Review imports now fall back safely if the reviews table is not ready yet.
               </div>
             </div>
           </article>
@@ -136,9 +165,8 @@ export default async function AdminPage() {
                 No cabins yet
               </h2>
               <p className="mt-4 max-w-2xl text-sm leading-7 text-stone-700">
-                Add your first real cabin manually, or if you are signed in as
-                the owner, generate a mock cabin to quickly test the full admin,
-                listing, detail page, and reservation flow.
+                Add your first cabin listing to start building the public catalog
+                and reservation flow for guests.
               </p>
             </article>
           ) : null}

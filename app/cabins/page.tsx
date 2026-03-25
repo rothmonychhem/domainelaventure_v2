@@ -30,14 +30,14 @@ export default async function CabinsPage() {
           </p>
           <h1 className="font-heading mt-3 text-5xl font-semibold text-[var(--accent-dark)]">
             <LocalizedText
-              en="Browse every chalet and find the right atmosphere for your guests."
-              fr="Parcourez chaque chalet et trouvez l'atmosphere ideale pour vos voyageurs."
+              en="Browse every chalet and choose the stay that fits the pace of your trip."
+              fr="Parcourez chaque chalet et choisissez le sejour qui convient au rythme de votre escapade."
             />
           </h1>
           <p className="mt-5 max-w-3xl text-base leading-7 text-stone-700">
             <LocalizedText
-              en="Each cabin has its own page with visuals, amenities, and a direct reservation path. This keeps the browsing experience clear while still feeling warm and premium."
-              fr="Chaque chalet a sa propre page avec visuels, commodites et acces direct a la reservation. L'experience reste claire, chaleureuse et soignee."
+              en="Compare the mood, layout, and amenities of each chalet before sending a direct reservation request."
+              fr="Comparez l'ambiance, l'agencement et les commodites de chaque chalet avant d'envoyer une demande de reservation directe."
             />
           </p>
         </div>
@@ -97,15 +97,18 @@ export default async function CabinsPage() {
                 <div className="space-y-4 md:text-right">
                   <p className="text-sm font-semibold text-[var(--pine)]">
                     <LocalizedText
-                      en={`Starting from ${cabin.price}`}
-                      fr={`A partir de ${cabin.price}`}
+                      en={`From $${cabin.price} / night`}
+                      fr={`A partir de $${cabin.price} / nuit`}
                     />
                   </p>
                   <Link
                     href={`/cabins/${cabin.slug}`}
-                    className="inline-block rounded-full bg-[var(--accent-dark)] px-5 py-3 text-sm font-semibold text-white transition hover:bg-[var(--accent)]"
+                    className="inline-block rounded-full bg-[var(--accent-dark)] px-5 py-3 text-sm font-semibold text-white transition hover:bg-[var(--accent)] hover:text-white visited:text-white"
+                    style={{ color: "#ffffff" }}
                   >
-                    <LocalizedText en="Open detail page" fr="Voir la page detaillee" />
+                    <span className="text-white">
+                      <LocalizedText en="Open detail page" fr="Voir la page detaillee" />
+                    </span>
                   </Link>
                 </div>
               </div>

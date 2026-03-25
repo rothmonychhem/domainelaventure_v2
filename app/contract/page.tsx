@@ -149,18 +149,57 @@ function getCabinCardImage(
   );
 }
 
+function buildCabinMomentCards(cabins: Awaited<ReturnType<typeof getAllCabins>>) {
+  const cards = cabins.flatMap((cabin) => {
+    const images = cabin.images.filter((image) => image.mediaType === "image");
+
+    if (images.length === 0) {
+      return [
+        {
+          id: `${cabin.id}-fallback`,
+          slug: cabin.slug,
+          name: cabin.name,
+          address: cabin.address,
+          imageUrl: getCabinCardImage(cabin.images),
+        },
+      ];
+    }
+
+    return images.map((image) => ({
+      id: image.id,
+      slug: cabin.slug,
+      name: cabin.name,
+      address: cabin.address,
+      imageUrl: image.url,
+    }));
+  });
+
+  if (cards.length === 0) {
+    return fallbackMomentImages.map((imageUrl, index) => ({
+      id: `fallback-${index}`,
+      slug: "/cabins",
+      name: "Domaine l Aventur",
+      address: "Cabin gallery",
+      imageUrl,
+    }));
+  }
+
+  const daySeed = new Date().getDate();
+
+  return [...cards]
+    .sort((left, right) =>
+      `${left.id}-${daySeed}`.localeCompare(`${right.id}-${daySeed}`)
+    )
+    .slice(0, Math.min(10, cards.length));
+}
+
 export const dynamic = "force-dynamic";
 
 export default async function ContractPage() {
   const cabins = await getAllCabins();
   const spotlightCabin =
     cabins.length > 0 ? cabins[new Date().getDate() % cabins.length] : null;
-  const cabinMomentImages = [
-    ...(spotlightCabin?.images
-      .filter((image) => image.mediaType === "image")
-      .map((image) => image.url) ?? []),
-    ...fallbackMomentImages,
-  ].slice(0, 3);
+  const cabinMomentCards = buildCabinMomentCards(cabins);
 
   return (
     <main className="shell min-h-screen">
@@ -234,35 +273,6 @@ export default async function ContractPage() {
               </p>
             </section>
 
-            <section className="panel overflow-hidden rounded-[2rem]">
-              {spotlightCabin ? (
-                <>
-                  <div className="h-56 bg-cover bg-center" style={{ backgroundImage: `linear-gradient(180deg, rgba(23, 18, 14, 0.08), rgba(23, 18, 14, 0.38)), url('${getCabinCardImage(spotlightCabin.images)}')` }} />
-                  <div className="p-7">
-                    <SectionAccent icon="spark" label={<LocalizedText en="Cabin spotlight" fr="Chalet en vedette" />} />
-                    <h2 className="font-heading mt-4 text-3xl font-semibold text-[var(--accent-dark)]">{spotlightCabin.name}</h2>
-                    <p className="mt-2 text-sm font-medium text-stone-500">{spotlightCabin.address}</p>
-                    <p className="mt-4 text-sm leading-7 text-stone-700">{spotlightCabin.description}</p>
-                    <div className="mt-6 flex flex-col gap-3 sm:flex-row">
-                      <Link href={`/cabins/${spotlightCabin.slug}`} className="rounded-full bg-[var(--accent-dark)] px-5 py-3 text-center text-sm font-semibold text-white transition hover:bg-[var(--accent)]">
-                        <LocalizedText en="View this cabin" fr="Voir ce chalet" />
-                      </Link>
-                      <Link href={`/contact?cabin=${encodeURIComponent(spotlightCabin.name)}`} className="rounded-full border border-[var(--line)] px-5 py-3 text-center text-sm font-semibold text-[var(--accent-dark)] transition hover:bg-white">
-                        <LocalizedText en="Request this stay" fr="Demander ce sejour" />
-                      </Link>
-                    </div>
-                  </div>
-                </>
-              ) : (
-                <div className="p-7">
-                  <SectionAccent icon="spark" label={<LocalizedText en="Cabin spotlight" fr="Chalet en vedette" />} />
-                  <h2 className="font-heading mt-4 text-3xl font-semibold text-[var(--accent-dark)]">
-                    <LocalizedText en="A retreat preview will appear here" fr="Un apercu du refuge apparaitra ici" />
-                  </h2>
-                </div>
-              )}
-            </section>
-
             <section className="panel rounded-[2rem] p-7">
               <SectionAccent icon="leaf" label={<LocalizedText en="Good to know" fr="Bon a savoir" />} />
               <div className="mt-5 space-y-4">
@@ -273,41 +283,117 @@ export default async function ContractPage() {
                 ))}
               </div>
             </section>
-
-            <section className="panel rounded-[2rem] p-7">
-              <SectionAccent icon="spark" label={<LocalizedText en="Cabin moments" fr="Instants du chalet" />} />
-              <div className="mt-5 grid gap-3 sm:grid-cols-2">
-                <div className="min-h-[10rem] rounded-[1.5rem] bg-cover bg-center sm:col-span-2" style={{ backgroundImage: `linear-gradient(180deg, rgba(23, 18, 14, 0.1), rgba(23, 18, 14, 0.28)), url('${cabinMomentImages[0]}')` }} />
-                <div className="min-h-[8.5rem] rounded-[1.5rem] bg-cover bg-center" style={{ backgroundImage: `linear-gradient(180deg, rgba(23, 18, 14, 0.08), rgba(23, 18, 14, 0.24)), url('${cabinMomentImages[1]}')` }} />
-                <div className="min-h-[8.5rem] rounded-[1.5rem] bg-cover bg-center" style={{ backgroundImage: `linear-gradient(180deg, rgba(23, 18, 14, 0.08), rgba(23, 18, 14, 0.24)), url('${cabinMomentImages[2]}')` }} />
-              </div>
-              <p className="mt-4 text-sm leading-7 text-stone-700">
-                <LocalizedText en="A quick glimpse of the atmosphere guests come for: forest air, slower mornings, and warm chalet evenings." fr="Un apercu de l'ambiance que les voyageurs viennent chercher : air de foret, matins plus doux et soirees de chalet chaleureuses." />
-              </p>
-            </section>
-
-            <section className="rounded-[2rem] border border-[rgba(48,71,46,0.14)] bg-[linear-gradient(180deg,rgba(224,236,217,0.92),rgba(244,248,239,0.88))] p-7 shadow-[0_24px_60px_rgba(39,61,44,0.12)]">
-              <SectionAccent icon="mail" label={<LocalizedText en="Follow for specials" fr="Suivre pour les offres" />} />
-              <h2 className="font-heading mt-4 text-3xl font-semibold text-[var(--accent-dark)]">
-                <LocalizedText en="Follow along for insider updates and seasonal offers." fr="Suivez-nous pour les nouveautes privees et les offres de saison." />
-              </h2>
-              <div className="mt-5 space-y-3">
-                {socialHighlights.map((item) => (
-                  <div key={item.enLabel} className="soft-ring rounded-[1.4rem] bg-white/72 px-4 py-4">
-                    <p className="text-sm font-semibold text-[var(--accent-dark)]">
-                      <LocalizedText en={item.enLabel} fr={item.frLabel} />
-                    </p>
-                    <p className="mt-1 text-sm leading-6 text-stone-700">
-                      <LocalizedText en={item.enNote} fr={item.frNote} />
-                    </p>
-                  </div>
-                ))}
-              </div>
-              <Link href="/contact" className="mt-5 inline-block rounded-full bg-[var(--accent-dark)] px-5 py-3 text-sm font-semibold text-white transition hover:bg-[var(--accent)]">
-                <LocalizedText en="Ask about current offers" fr="Demander les offres du moment" />
-              </Link>
-            </section>
           </div>
+        </div>
+
+        <div className="mx-auto mt-6 max-w-7xl">
+          <section className="panel rounded-[2rem] p-7 md:p-8">
+            <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
+              <div>
+                <SectionAccent icon="spark" label={<LocalizedText en="Cabin moments" fr="Instants du chalet" />} />
+                <h2 className="font-heading mt-4 text-4xl font-semibold text-[var(--accent-dark)]">
+                  <LocalizedText
+                    en="Explore moments from across the cabins"
+                    fr="Explorez des instants venant de plusieurs chalets"
+                  />
+                </h2>
+              </div>
+              <p className="max-w-2xl text-sm leading-7 text-stone-700">
+                <LocalizedText
+                  en="Open any photo to jump directly to that cabin and explore the full listing."
+                  fr="Ouvrez n'importe quelle photo pour aller directement vers ce chalet et voir la fiche complete."
+                />
+              </p>
+            </div>
+
+            <div className="mt-6 grid auto-rows-[11rem] gap-3 md:grid-cols-4">
+              {cabinMomentCards.map((card, index) => (
+                <Link
+                  key={card.id}
+                  href={card.slug.startsWith("/") ? card.slug : `/cabins/${card.slug}`}
+                  className={`group relative overflow-hidden rounded-[1.6rem] ${
+                    index % 5 === 0
+                      ? "md:col-span-2 md:row-span-2"
+                      : index % 4 === 0
+                        ? "md:row-span-2"
+                        : ""
+                  }`}
+                >
+                  <div
+                    className="absolute inset-0 bg-cover bg-center transition duration-300 group-hover:scale-[1.03]"
+                    style={{
+                      backgroundImage: `linear-gradient(180deg, rgba(21, 17, 13, 0.1), rgba(21, 17, 13, 0.52)), url('${card.imageUrl}')`,
+                    }}
+                  />
+                </Link>
+              ))}
+            </div>
+          </section>
+        </div>
+
+        <div className="mx-auto mt-6 grid max-w-7xl gap-6 lg:grid-cols-[1.05fr_0.95fr]">
+          <section className="panel overflow-hidden rounded-[2rem]">
+            {spotlightCabin ? (
+              <>
+                <div className="h-56 bg-cover bg-center" style={{ backgroundImage: `linear-gradient(180deg, rgba(23, 18, 14, 0.08), rgba(23, 18, 14, 0.38)), url('${getCabinCardImage(spotlightCabin.images)}')` }} />
+                <div className="p-7">
+                  <SectionAccent icon="spark" label={<LocalizedText en="Cabin spotlight" fr="Chalet en vedette" />} />
+                  <h2 className="font-heading mt-4 text-3xl font-semibold text-[var(--accent-dark)]">{spotlightCabin.name}</h2>
+                  <p className="mt-2 text-sm font-medium text-stone-500">{spotlightCabin.address}</p>
+                  <p className="mt-4 text-sm leading-7 text-stone-700">{spotlightCabin.description}</p>
+                  <div className="mt-6 flex flex-col gap-3 sm:flex-row">
+                    <Link
+                      href={`/cabins/${spotlightCabin.slug}`}
+                      className="rounded-full bg-[var(--accent-dark)] px-5 py-3 text-center text-sm font-semibold text-white transition hover:bg-[var(--accent)] hover:text-white visited:text-white"
+                      style={{ color: "#ffffff" }}
+                    >
+                      <span className="text-white">
+                        <LocalizedText en="View this cabin" fr="Voir ce chalet" />
+                      </span>
+                    </Link>
+                    <Link href={`/contact?cabin=${encodeURIComponent(spotlightCabin.name)}`} className="rounded-full border border-[var(--line)] px-5 py-3 text-center text-sm font-semibold text-[var(--accent-dark)] transition hover:bg-white">
+                      <LocalizedText en="Request this stay" fr="Demander ce sejour" />
+                    </Link>
+                  </div>
+                </div>
+              </>
+            ) : (
+              <div className="p-7">
+                <SectionAccent icon="spark" label={<LocalizedText en="Cabin spotlight" fr="Chalet en vedette" />} />
+                <h2 className="font-heading mt-4 text-3xl font-semibold text-[var(--accent-dark)]">
+                  <LocalizedText en="A retreat preview will appear here" fr="Un apercu du refuge apparaitra ici" />
+                </h2>
+              </div>
+            )}
+          </section>
+
+          <section className="rounded-[2rem] border border-[rgba(48,71,46,0.14)] bg-[linear-gradient(180deg,rgba(224,236,217,0.92),rgba(244,248,239,0.88))] p-7 shadow-[0_24px_60px_rgba(39,61,44,0.12)]">
+            <SectionAccent icon="mail" label={<LocalizedText en="Follow for specials" fr="Suivre pour les offres" />} />
+            <h2 className="font-heading mt-4 text-3xl font-semibold text-[var(--accent-dark)]">
+              <LocalizedText en="Follow along for insider updates and seasonal offers." fr="Suivez-nous pour les nouveautes privees et les offres de saison." />
+            </h2>
+            <div className="mt-5 space-y-3">
+              {socialHighlights.map((item) => (
+                <div key={item.enLabel} className="soft-ring rounded-[1.4rem] bg-white/72 px-4 py-4">
+                  <p className="text-sm font-semibold text-[var(--accent-dark)]">
+                    <LocalizedText en={item.enLabel} fr={item.frLabel} />
+                  </p>
+                  <p className="mt-1 text-sm leading-6 text-stone-700">
+                    <LocalizedText en={item.enNote} fr={item.frNote} />
+                  </p>
+                </div>
+              ))}
+            </div>
+            <Link
+              href="/contact"
+              className="mt-5 inline-block rounded-full bg-[var(--accent-dark)] px-5 py-3 text-sm font-semibold text-white transition hover:bg-[var(--accent)] hover:text-white visited:text-white"
+              style={{ color: "#ffffff" }}
+            >
+              <span className="text-white">
+                <LocalizedText en="Ask about current offers" fr="Demander les offres du moment" />
+              </span>
+            </Link>
+          </section>
         </div>
       </section>
       <Footer />

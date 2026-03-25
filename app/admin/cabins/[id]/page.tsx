@@ -3,6 +3,7 @@ import Link from "next/link";
 import { getSession } from "@/lib/auth";
 import { getCabinById } from "@/lib/cabins";
 import CabinEditorForm from "@/components/CabinEditorForm";
+import CabinDeletePanel from "@/components/CabinDeletePanel";
 
 export const dynamic = "force-dynamic";
 
@@ -46,6 +47,16 @@ export default async function EditCabinPage({
             The cabin could not be updated because the database connection is unavailable right now.
           </div>
         ) : null}
+        {query.error === "delete-confirmation" ? (
+          <div className="mt-6 rounded-[1.2rem] border border-rose-200 bg-rose-50 px-4 py-4 text-sm leading-6 text-rose-900">
+            The cabin name did not match exactly, so the cabin was not deleted.
+          </div>
+        ) : null}
+        {query.error === "delete-db" ? (
+          <div className="mt-6 rounded-[1.2rem] border border-rose-200 bg-rose-50 px-4 py-4 text-sm leading-6 text-rose-900">
+            The cabin could not be deleted because the database connection is unavailable right now.
+          </div>
+        ) : null}
         <CabinEditorForm
           action={`/api/cabins/${cabin.id}`}
           submitLabel="Save changes"
@@ -78,6 +89,7 @@ export default async function EditCabinPage({
             isHero: image.isHero,
           }))}
         />
+        <CabinDeletePanel cabinId={cabin.id} cabinName={cabin.name} />
       </div>
     </main>
   );

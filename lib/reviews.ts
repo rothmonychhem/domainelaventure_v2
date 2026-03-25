@@ -1,7 +1,7 @@
 import { randomUUID } from "crypto";
 import { promises as fs } from "fs";
 import path from "path";
-import { Prisma } from "@prisma/client";
+import { Prisma, type PrismaClient } from "@prisma/client";
 import { z } from "zod";
 import { getAllCabins } from "@/lib/cabins";
 import { saveUploadedMediaToFolder } from "@/lib/cabin-media";
@@ -70,6 +70,10 @@ function isDatabaseConfigured() {
   return Boolean(process.env.DATABASE_URL || process.env.DIRECT_DATABASE_URL);
 }
 
+function getReviewDelegate() {
+  return (prisma as PrismaClient & { review?: PrismaClient["review"] }).review;
+}
+
 function isReviewStorageUnavailable(error: unknown) {
   if (!(error instanceof Error)) {
     return false;
@@ -84,6 +88,7 @@ function isReviewStorageUnavailable(error: unknown) {
     message.includes("invalid datasource") ||
     message.includes("accelerate") ||
     message.includes("direct_database_url or database_url must be set") ||
+    message.includes("cannot read properties of undefined") ||
     message.includes("review") && message.includes("does not exist") ||
     message.includes("relation") && message.includes("review")
   );
@@ -188,9 +193,11 @@ async function resolveCabin(input: { cabinId?: string; cabinName?: string }) {
 }
 
 export async function getPublishedReviews() {
-  if (isDatabaseConfigured()) {
+  const reviewDelegate = getReviewDelegate();
+
+  if (isDatabaseConfigured() && reviewDelegate) {
     try {
-      const reviews = await prisma.review.findMany({
+      const reviews = await reviewDelegate.findMany({
         where: { approved: true },
         include: reviewInclude,
         orderBy: [{ featured: "desc" }, { createdAt: "desc" }],
@@ -215,9 +222,11 @@ export async function getPublishedReviewsForCabin(cabinId: string) {
     return [];
   }
 
-  if (isDatabaseConfigured()) {
+  const reviewDelegate = getReviewDelegate();
+
+  if (isDatabaseConfigured() && reviewDelegate) {
     try {
-      const reviews = await prisma.review.findMany({
+      const reviews = await reviewDelegate.findMany({
         where: {
           approved: true,
           cabinId: normalizedId,
@@ -241,9 +250,11 @@ export async function getPublishedReviewsForCabin(cabinId: string) {
 }
 
 export async function getAllStoredReviews() {
-  if (isDatabaseConfigured()) {
+  const reviewDelegate = getReviewDelegate();
+
+  if (isDatabaseConfigured() && reviewDelegate) {
     try {
-      const reviews = await prisma.review.findMany({
+      const reviews = await reviewDelegate.findMany({
         include: reviewInclude,
         orderBy: [{ featured: "desc" }, { createdAt: "desc" }],
       });
@@ -291,9 +302,11 @@ export async function createPublicReview(input: unknown, files: File[] = []) {
   });
   const imageUrls = await saveReviewImages(files);
 
-  if (isDatabaseConfigured()) {
+  const reviewDelegate = getReviewDelegate();
+
+  if (isDatabaseConfigured() && reviewDelegate) {
     try {
-      const review = await prisma.review.create({
+      const review = await reviewDelegate.create({
         data: {
           reviewerName: sanitizeText(parsed.reviewerName) || "Anonymous",
           reviewerLocation: sanitizeText(parsed.reviewerLocation) || null,
@@ -392,7 +405,9 @@ function parseImportedReviews(raw: string) {
 export async function importAirbnbReviews(raw: string) {
   const parsedReviews = parseImportedReviews(raw);
 
-  if (isDatabaseConfigured()) {
+  const reviewDelegate = getReviewDelegate();
+
+  if (isDatabaseConfigured() && reviewDelegate) {
     try {
       let createdCount = 0;
 
@@ -402,7 +417,7 @@ export async function importAirbnbReviews(raw: string) {
           cabinName: parsed.cabinName,
         });
 
-        await prisma.review.create({
+        await reviewDelegate.create({
           data: {
             reviewerName: sanitizeText(parsed.reviewerName),
             reviewerLocation: sanitizeText(parsed.reviewerLocation) || null,
@@ -469,9 +484,11 @@ export async function deleteStoredReview(reviewId: string) {
     throw new Error("Review id is required.");
   }
 
-  if (isDatabaseConfigured()) {
+  const reviewDelegate = getReviewDelegate();
+
+  if (isDatabaseConfigured() && reviewDelegate) {
     try {
-      await prisma.review.delete({
+      await reviewDelegate.delete({
         where: { id: normalizedId },
       });
 
