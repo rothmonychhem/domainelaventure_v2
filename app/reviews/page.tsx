@@ -22,11 +22,11 @@ export default async function ReviewsPage() {
         <div className="mx-auto max-w-7xl rounded-[2rem] border border-[var(--line)] bg-white/55 px-7 py-10 md:px-10">
           <p className="eyebrow">Guest reviews</p>
           <h1 className="font-heading mt-3 text-5xl font-semibold text-[var(--accent-dark)]">
-            A living guestbook for every stay and every cabin.
+            A warm guestbook for every stay and every cabin.
           </h1>
           <p className="mt-5 max-w-3xl text-base leading-7 text-stone-700">
-            Browse imported Airbnb reviews, filter by cabin or rating, and let
-            guests leave new feedback directly on the site.
+            Guests can leave a note, read through past stays, and explore what
+            each cabin feels like through real feedback.
           </p>
         </div>
       </section>

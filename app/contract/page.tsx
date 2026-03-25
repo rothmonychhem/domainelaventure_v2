@@ -92,6 +92,27 @@ const stayFacts = [
   "Clear departure steps make turnover faster and keep the next check-in smooth.",
 ];
 
+const fallbackMomentImages = [
+  "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=1200&q=80",
+  "https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1200&q=80",
+  "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1200&q=80",
+];
+
+const socialHighlights = [
+  {
+    label: "Instagram",
+    note: "Behind-the-scenes cabin mood, morning light, and seasonal styling.",
+  },
+  {
+    label: "Facebook",
+    note: "Weekend openings, family-friendly updates, and last-minute specials.",
+  },
+  {
+    label: "Guest list",
+    note: "A simple place to share insider info, events, and quiet-season offers.",
+  },
+];
+
 function getCabinCardImage(
   images: Array<{ url: string; mediaType: string; isHero: boolean }>
 ) {
@@ -313,6 +334,12 @@ export default async function ContractPage() {
   const cabins = await getAllCabins();
   const spotlightCabin =
     cabins.length > 0 ? cabins[new Date().getDate() % cabins.length] : null;
+  const cabinMomentImages = [
+    ...(spotlightCabin?.images
+      .filter((image) => image.mediaType === "image")
+      .map((image) => image.url) ?? []),
+    ...fallbackMomentImages,
+  ].slice(0, 3);
 
   return (
     <main className="shell min-h-screen">
@@ -469,6 +496,67 @@ export default async function ContractPage() {
                   </div>
                 ))}
               </div>
+            </section>
+
+            <section className="panel rounded-[2rem] p-7">
+              <SectionAccent icon="spark" label="Cabin moments" />
+              <div className="mt-5 grid gap-3 sm:grid-cols-2">
+                <div
+                  className="min-h-[10rem] rounded-[1.5rem] bg-cover bg-center sm:col-span-2"
+                  style={{
+                    backgroundImage: `linear-gradient(180deg, rgba(23, 18, 14, 0.1), rgba(23, 18, 14, 0.28)), url('${cabinMomentImages[0]}')`,
+                  }}
+                />
+                <div
+                  className="min-h-[8.5rem] rounded-[1.5rem] bg-cover bg-center"
+                  style={{
+                    backgroundImage: `linear-gradient(180deg, rgba(23, 18, 14, 0.08), rgba(23, 18, 14, 0.24)), url('${cabinMomentImages[1]}')`,
+                  }}
+                />
+                <div
+                  className="min-h-[8.5rem] rounded-[1.5rem] bg-cover bg-center"
+                  style={{
+                    backgroundImage: `linear-gradient(180deg, rgba(23, 18, 14, 0.08), rgba(23, 18, 14, 0.24)), url('${cabinMomentImages[2]}')`,
+                  }}
+                />
+              </div>
+              <p className="mt-4 text-sm leading-7 text-stone-700">
+                A quick glimpse of the atmosphere guests come for: forest air,
+                slower mornings, and warm chalet evenings.
+              </p>
+            </section>
+
+            <section className="rounded-[2rem] border border-[rgba(48,71,46,0.14)] bg-[linear-gradient(180deg,rgba(224,236,217,0.92),rgba(244,248,239,0.88))] p-7 shadow-[0_24px_60px_rgba(39,61,44,0.12)]">
+              <SectionAccent icon="mail" label="Follow for specials" />
+              <h2 className="font-heading mt-4 text-3xl font-semibold text-[var(--accent-dark)]">
+                Follow along for insider updates and seasonal offers.
+              </h2>
+              <div className="mt-5 space-y-3">
+                {socialHighlights.map((item) => (
+                  <div
+                    key={item.label}
+                    className="soft-ring rounded-[1.4rem] bg-white/72 px-4 py-4"
+                  >
+                    <p className="text-sm font-semibold text-[var(--accent-dark)]">
+                      {item.label}
+                    </p>
+                    <p className="mt-1 text-sm leading-6 text-stone-700">
+                      {item.note}
+                    </p>
+                  </div>
+                ))}
+              </div>
+              <p className="mt-5 text-sm leading-7 text-stone-700">
+                Real social handles can be dropped into this block whenever you
+                are ready. For now, guests can still ask about upcoming specials
+                directly.
+              </p>
+              <Link
+                href="/contact"
+                className="mt-5 inline-block rounded-full bg-[var(--accent-dark)] px-5 py-3 text-sm font-semibold text-white transition hover:bg-[var(--accent)]"
+              >
+                Ask about current offers
+              </Link>
             </section>
           </div>
         </div>

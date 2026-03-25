@@ -9,7 +9,12 @@ export const dynamic = "force-dynamic";
 export default async function AdminReviewsPage({
   searchParams,
 }: {
-  searchParams: Promise<{ success?: string; count?: string; error?: string }>;
+  searchParams: Promise<{
+    success?: string;
+    count?: string;
+    deleted?: string;
+    error?: string;
+  }>;
 }) {
   const session = await getSession();
 
@@ -128,6 +133,11 @@ export default async function AdminReviewsPage({
                 Imported {params.count || "0"} review{params.count === "1" ? "" : "s"}.
               </div>
             ) : null}
+            {params.deleted === "1" ? (
+              <div className="mt-5 rounded-[1.2rem] border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-900">
+                Review deleted successfully.
+              </div>
+            ) : null}
             {params.error ? (
               <div className="mt-5 rounded-[1.2rem] border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-900">
                 {params.error}
@@ -169,7 +179,7 @@ export default async function AdminReviewsPage({
                     <span className="font-semibold text-[var(--accent-dark)]">
                       {cabin.name}
                     </span>
-                    <span className="text-stone-500"> • {cabin.address}</span>
+                    <span className="text-stone-500"> - {cabin.address}</span>
                   </div>
                 ))
               ) : (
@@ -180,6 +190,75 @@ export default async function AdminReviewsPage({
               )}
             </div>
           </article>
+        </section>
+
+        <section className="panel rounded-[2rem] p-7">
+          <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
+            <div>
+              <p className="eyebrow">Moderation</p>
+              <h2 className="font-heading mt-3 text-3xl font-semibold text-[var(--accent-dark)]">
+                Remove hateful or unwanted reviews
+              </h2>
+              <p className="mt-3 max-w-3xl text-sm leading-7 text-stone-700">
+                Use this list to remove reviews that are abusive, hateful, spammy,
+                or simply not meant to stay public.
+              </p>
+            </div>
+            <p className="text-sm font-semibold text-stone-500">
+              {reviews.length} review{reviews.length === 1 ? "" : "s"} available
+            </p>
+          </div>
+
+          <div className="mt-6 space-y-4">
+            {reviews.length > 0 ? (
+              reviews.map((review) => (
+                <article
+                  key={review.id}
+                  className="soft-ring rounded-[1.5rem] bg-white/72 p-5"
+                >
+                  <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
+                    <div className="min-w-0 flex-1">
+                      <div className="flex flex-wrap items-center gap-2">
+                        <p className="font-heading text-2xl font-semibold text-[var(--accent-dark)]">
+                          {review.title}
+                        </p>
+                        <span className="rounded-full bg-[rgba(86,112,71,0.12)] px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-[var(--accent-dark)]">
+                          {review.source}
+                        </span>
+                        <span className="rounded-full bg-[rgba(48,71,46,0.08)] px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-stone-600">
+                          {review.rating}/5
+                        </span>
+                      </div>
+                      <p className="mt-2 text-sm font-medium text-stone-500">
+                        {review.reviewerName}
+                        {review.reviewerLocation
+                          ? `, ${review.reviewerLocation}`
+                          : ""}
+                        {review.cabinName ? ` - ${review.cabinName}` : ""}
+                      </p>
+                      <p className="mt-3 text-sm leading-7 text-stone-700">
+                        {review.body}
+                      </p>
+                    </div>
+
+                    <form
+                      action={`/api/reviews/${review.id}/delete`}
+                      method="POST"
+                      className="shrink-0"
+                    >
+                      <button className="rounded-full border border-rose-200 bg-rose-50 px-5 py-3 text-sm font-semibold text-rose-700 transition hover:bg-rose-100">
+                        Delete review
+                      </button>
+                    </form>
+                  </div>
+                </article>
+              ))
+            ) : (
+              <div className="soft-ring rounded-[1.5rem] bg-white/72 p-5 text-sm leading-7 text-stone-700">
+                No reviews to moderate yet.
+              </div>
+            )}
+          </div>
         </section>
       </div>
     </main>

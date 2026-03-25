@@ -41,7 +41,7 @@ export type ReviewRecord = {
 const reviewsFilePath = path.join(process.cwd(), "data", "reviews.json");
 
 const publicReviewSchema = z.object({
-  reviewerName: z.string().trim().min(2).max(80),
+  reviewerName: z.string().trim().max(80).optional().default(""),
   reviewerLocation: z.string().trim().max(80).optional().default(""),
   title: z.string().trim().min(3).max(120),
   body: z.string().trim().min(20).max(1400),
@@ -178,7 +178,7 @@ async function resolveCabin(input: { cabinId?: string; cabinName?: string }) {
 
   return {
     cabinId: cabin?.id ?? null,
-    cabinName: cabin?.name ?? sanitizeText(input.cabinName ?? "") || null,
+    cabinName: cabin?.name ?? (sanitizeText(input.cabinName ?? "") || null),
     cabinSlug: cabin?.slug ?? null,
   };
 }
@@ -202,6 +202,38 @@ export async function getPublishedReviews() {
 
   const reviews = await readFileReviews();
   return reviews.filter((review) => review.approved);
+}
+
+export async function getPublishedReviewsForCabin(cabinId: string) {
+  const normalizedId = sanitizeText(cabinId);
+
+  if (!normalizedId) {
+    return [];
+  }
+
+  if (isDatabaseConfigured()) {
+    try {
+      const reviews = await prisma.review.findMany({
+        where: {
+          approved: true,
+          cabinId: normalizedId,
+        },
+        include: reviewInclude,
+        orderBy: [{ featured: "desc" }, { createdAt: "desc" }],
+      });
+
+      return reviews.map(mapDbReview);
+    } catch (error) {
+      if (!isReviewStorageUnavailable(error)) {
+        throw error;
+      }
+    }
+  }
+
+  const reviews = await readFileReviews();
+  return reviews.filter(
+    (review) => review.approved && review.cabinId === normalizedId
+  );
 }
 
 export async function getAllStoredReviews() {
@@ -235,7 +267,7 @@ export async function createPublicReview(input: unknown) {
     try {
       const review = await prisma.review.create({
         data: {
-          reviewerName: sanitizeText(parsed.reviewerName),
+          reviewerName: sanitizeText(parsed.reviewerName) || "Anonymous",
           reviewerLocation: sanitizeText(parsed.reviewerLocation) || null,
           title: sanitizeText(parsed.title),
           body: sanitizeText(parsed.body),
@@ -259,7 +291,7 @@ export async function createPublicReview(input: unknown) {
 
   const review: ReviewRecord = {
     id: randomUUID(),
-    reviewerName: sanitizeText(parsed.reviewerName),
+    reviewerName: sanitizeText(parsed.reviewerName) || "Anonymous",
     reviewerLocation: sanitizeText(parsed.reviewerLocation) || null,
     title: sanitizeText(parsed.title),
     body: sanitizeText(parsed.body),
@@ -396,4 +428,35 @@ export async function importAirbnbReviews(raw: string) {
 
   await writeFileReviews(reviews);
   return parsedReviews.length;
+}
+
+export async function deleteStoredReview(reviewId: string) {
+  const normalizedId = sanitizeText(reviewId);
+
+  if (!normalizedId) {
+    throw new Error("Review id is required.");
+  }
+
+  if (isDatabaseConfigured()) {
+    try {
+      await prisma.review.delete({
+        where: { id: normalizedId },
+      });
+
+      return;
+    } catch (error) {
+      if (!isReviewStorageUnavailable(error)) {
+        throw error;
+      }
+    }
+  }
+
+  const reviews = await readFileReviews();
+  const nextReviews = reviews.filter((review) => review.id !== normalizedId);
+
+  if (nextReviews.length === reviews.length) {
+    throw new Error("Review not found.");
+  }
+
+  await writeFileReviews(nextReviews);
 }
