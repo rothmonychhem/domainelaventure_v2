@@ -35,6 +35,8 @@ export async function POST(req: Request) {
         address,
         description:
           "A polished mock listing for testing the owner workflow, cabin pages, and reservation experience before real content is entered.",
+        descriptionFr:
+          "Une fiche de chalet soignee pour tester le parcours proprietaire, les pages de chalet et l'experience de reservation avant d'ajouter le vrai contenu.",
         price: "325.00",
         guests: 6,
         bedrooms: 3,

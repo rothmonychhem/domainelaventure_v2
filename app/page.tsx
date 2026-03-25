@@ -42,6 +42,7 @@ export default async function HomePage() {
     name: cabin.name,
     address: cabin.address,
     description: cabin.description,
+    descriptionFr: cabin.descriptionFr,
     guests: cabin.guests,
     price: cabin.price,
     image: getCabinCardImage(cabin.images),

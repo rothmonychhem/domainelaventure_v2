@@ -19,8 +19,11 @@ function formatReviewDate(value: string) {
 
 function renderStars(rating: number) {
   return Array.from({ length: 5 }, (_, index) => (
-    <span key={index} className={index < rating ? "text-[#d89a31]" : "text-stone-300"}>
-      ★
+    <span
+      key={index}
+      className={index < rating ? "text-[#d89a31]" : "text-stone-300"}
+    >
+      {"\u2605"}
     </span>
   ));
 }
@@ -125,7 +128,9 @@ export default function ReviewsExplorer({
           throw new Error(payload.error || "Unable to save your review.");
         }
 
-        setReviews((current) => [payload.review!, ...current]);
+        const savedReview = payload.review;
+
+        setReviews((current) => [savedReview, ...current]);
         setSuccess(
           language === "fr"
             ? "Merci d'avoir partage votre sejour. Votre avis est maintenant publie."
@@ -148,266 +153,236 @@ export default function ReviewsExplorer({
 
   return (
     <div className="space-y-8">
-      <section className="grid gap-6 xl:grid-cols-[1.08fr_0.92fr]">
-        <div className="panel rounded-[2rem] p-7 md:p-8">
-          <p className="eyebrow">{language === "fr" ? "Laisser un avis" : "Leave a review"}</p>
-          <h2 className="font-heading mt-3 text-4xl font-semibold text-[var(--accent-dark)]">
-            {language === "fr"
-              ? "Partagez le ressenti de votre sejour."
-              : "Share the feeling of your stay."}
-          </h2>
-          <p className="mt-4 max-w-2xl text-sm leading-7 text-stone-700">
-            {language === "fr"
-              ? "Dites aux futurs voyageurs ce qui vous a le plus marque, que ce soit les matins calmes, le foyer ou l'atmosphere de la foret autour du chalet."
-              : "Tell future guests what stood out most, whether it was the quiet mornings, the fireplace, or the way the forest felt around the cabin."}
-          </p>
-
-          <form onSubmit={handleSubmit} className="mt-6 space-y-4">
-            <input type="text" name="website" className="hidden" tabIndex={-1} />
-            <input type="hidden" name="rating" value={selectedRating} />
-
-            <div className="grid gap-4 md:grid-cols-2">
-              <div>
-                <label className="mb-2 block text-sm font-semibold text-stone-700">
-                  {language === "fr" ? "Nom" : "Name"}
-                </label>
-                <input
-                  name="reviewerName"
-                  placeholder={language === "fr" ? "Optionnel" : "Optional"}
-                  className="w-full rounded-[1.2rem] border border-[var(--line)] bg-white px-4 py-3"
-                />
-              </div>
-              <div>
-                <label className="mb-2 block text-sm font-semibold text-stone-700">
-                  {language === "fr" ? "Lieu" : "Location"}
-                </label>
-                <input
-                  name="reviewerLocation"
-                  placeholder={language === "fr" ? "Optionnel" : "Optional"}
-                  className="w-full rounded-[1.2rem] border border-[var(--line)] bg-white px-4 py-3"
-                />
-              </div>
-            </div>
-
-            <div className="grid gap-4 md:grid-cols-2">
-              <div>
-                <label className="mb-2 block text-sm font-semibold text-stone-700">
-                  {language === "fr" ? "Chalet" : "Cabin"}
-                </label>
-                <select
-                  name="cabinId"
-                  className="w-full rounded-[1.2rem] border border-[var(--line)] bg-white px-4 py-3"
-                  defaultValue=""
-                >
-                  <option value="">
-                    {language === "fr" ? "Experience generale" : "General experience"}
-                  </option>
-                  {cabins.map((cabin) => (
-                    <option key={cabin.id} value={cabin.id}>
-                      {cabin.name}
-                    </option>
-                  ))}
-                </select>
-              </div>
-              <div>
-                <label className="mb-2 block text-sm font-semibold text-stone-700">
-                  {language === "fr" ? "Note en etoiles" : "Star rating"}
-                </label>
-                <div className="flex items-center gap-2 rounded-[1.2rem] border border-[var(--line)] bg-white px-4 py-3">
-                  {Array.from({ length: 5 }, (_, index) => {
-                    const starValue = index + 1;
-
-                    return (
-                      <button
-                        key={starValue}
-                        type="button"
-                        onClick={() => setSelectedRating(starValue)}
-                        className="text-2xl leading-none transition hover:scale-110"
-                        aria-label={
-                          language === "fr"
-                            ? `Choisir ${starValue} etoiles`
-                            : `Set ${starValue} star rating`
-                        }
-                      >
-                        <span
-                          className={
-                            starValue <= selectedRating
-                              ? "text-[#d89a31]"
-                              : "text-stone-300"
-                          }
-                        >
-                          ★
-                        </span>
-                      </button>
-                    );
-                  })}
-                  <span className="ml-2 text-sm font-semibold text-stone-600">
-                    {selectedRating}/5
-                  </span>
-                </div>
-              </div>
-            </div>
-
-            <div className="grid gap-4 md:grid-cols-2">
-              <div>
-                <label className="mb-2 block text-sm font-semibold text-stone-700">
-                  {language === "fr" ? "Titre de l'avis" : "Review title"}
-                </label>
-                <input
-                  name="title"
-                  required
-                  className="w-full rounded-[1.2rem] border border-[var(--line)] bg-white px-4 py-3"
-                />
-              </div>
-              <div>
-                <label className="mb-2 block text-sm font-semibold text-stone-700">
-                  {language === "fr" ? "Repere du sejour" : "Stay label"}
-                </label>
-                <input
-                  name="stayLabel"
-                  placeholder={
-                    language === "fr" ? "Exemple : fevrier 2026" : "Example: February 2026"
-                  }
-                  className="w-full rounded-[1.2rem] border border-[var(--line)] bg-white px-4 py-3"
-                />
-              </div>
-            </div>
-
-            <div>
-              <label className="mb-2 block text-sm font-semibold text-stone-700">
-                {language === "fr" ? "Avis" : "Review"}
-              </label>
-              <textarea
-                name="body"
-                rows={7}
-                required
-                className="w-full rounded-[1.2rem] border border-[var(--line)] bg-white px-4 py-3"
-              />
-            </div>
-
-            <div>
-              <label className="mb-2 block text-sm font-semibold text-stone-700">
-                {language === "fr" ? "Photos du sejour" : "Stay photos"}
-              </label>
-              <div className="rounded-[1.2rem] border border-[var(--line)] bg-white px-4 py-4">
-                <input
-                  type="file"
-                  name="photos"
-                  multiple
-                  accept="image/*"
-                  onChange={(event) =>
-                    setPhotoNames(
-                      Array.from(event.currentTarget.files ?? []).map((file) => file.name)
-                    )
-                  }
-                  className="w-full text-sm text-stone-700"
-                />
-                <p className="mt-2 text-xs leading-6 text-stone-500">
-                  {language === "fr"
-                    ? "Optionnel. Jusqu'a 4 images, 5 Mo chacune."
-                    : "Optional. Up to 4 images, 5 MB each."}
-                </p>
-                {photoNames.length > 0 ? (
-                  <div className="mt-3 flex flex-wrap gap-2">
-                    {photoNames.map((name) => (
-                      <span
-                        key={name}
-                        className="rounded-full bg-[rgba(86,112,71,0.12)] px-3 py-1 text-xs font-semibold text-[var(--accent-dark)]"
-                      >
-                        {name}
-                      </span>
-                    ))}
-                  </div>
-                ) : null}
-              </div>
-            </div>
-
-            {error ? (
-              <div className="rounded-[1.2rem] border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-900">
-                {error}
-              </div>
-            ) : null}
-            {success ? (
-              <div className="rounded-[1.2rem] border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-900">
-                {success}
-              </div>
-            ) : null}
-
-            <button
-              disabled={isPending}
-              className="rounded-full bg-[var(--accent-dark)] px-6 py-3 font-semibold text-white transition hover:bg-[var(--accent)] disabled:cursor-not-allowed disabled:opacity-70"
-            >
-              {isPending
-                ? language === "fr"
-                  ? "Enregistrement..."
-                  : "Saving review..."
-                : language === "fr"
-                  ? "Publier l'avis"
-                  : "Publish review"}
-            </button>
-          </form>
-        </div>
-
-        <div className="space-y-6">
-          <div
-            className="overflow-hidden rounded-[2rem] border border-[var(--line)] bg-cover bg-center px-7 py-8 text-white shadow-[0_24px_60px_rgba(39,61,44,0.14)]"
-            style={{
-              backgroundImage:
-                "linear-gradient(180deg, rgba(24, 18, 14, 0.26), rgba(24, 18, 14, 0.56)), url('https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1600&q=80')",
-            }}
-          >
-            <p className="eyebrow text-[#f6d6a9]">
-              {language === "fr" ? "Ambiance du livre d'or" : "Guestbook mood"}
+      <section className="panel rounded-[2rem] p-7 md:p-8">
+        <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
+          <div className="max-w-2xl">
+            <p className="eyebrow">
+              {language === "fr" ? "Laisser un avis" : "Leave a review"}
             </p>
-            <h3 className="font-heading mt-3 text-4xl font-semibold">
+            <h2 className="font-heading mt-3 text-4xl font-semibold text-[var(--accent-dark)]">
               {language === "fr"
-                ? "Les meilleurs sejours se ressentent deux fois."
-                : "The best stays are felt twice."}
-            </h3>
-            <p className="mt-4 max-w-xl text-sm leading-7 text-stone-100">
+                ? "Partagez le ressenti de votre sejour."
+                : "Share the feeling of your stay."}
+            </h2>
+            <p className="mt-4 text-sm leading-7 text-stone-700">
               {language === "fr"
-                ? "Une premiere fois sur place, puis encore lorsqu'une autre personne lit l'histoire du calme, des lumieres chaudes et du rythme plus lent."
-                : "Once while you are there, and once again when someone else reads about the quiet lake air, the warm lights, and the slower pace."}
+                ? "Dites aux futurs voyageurs ce qui vous a le plus marque, que ce soit les matins calmes, le foyer ou l'atmosphere de la foret autour du chalet."
+                : "Tell future guests what stood out most, whether it was the quiet mornings, the fireplace, or the way the forest felt around the cabin."}
             </p>
           </div>
 
-          <div className="rounded-[2rem] bg-[var(--pine)] p-7 text-white">
-            <p className="eyebrow text-[#d6c5a8]">
-              {language === "fr" ? "En bref" : "At a glance"}
-            </p>
-            <div className="mt-5 grid gap-4 sm:grid-cols-2">
-              <div className="rounded-[1.5rem] border border-white/12 bg-white/8 px-4 py-4">
-                <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[#ead6b5]">
-                  {language === "fr" ? "Avis publies" : "Published reviews"}
-                </p>
-                <p className="font-heading mt-3 text-4xl font-semibold text-[#f7e7cd]">
-                  {reviews.length}
-                </p>
-              </div>
-              <div className="rounded-[1.5rem] border border-white/12 bg-white/8 px-4 py-4">
-                <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[#ead6b5]">
-                  {language === "fr" ? "Note moyenne" : "Average rating"}
-                </p>
-                <p className="font-heading mt-3 text-4xl font-semibold text-[#f7e7cd]">
-                  {averageRating}
-                </p>
-              </div>
+          <div className="flex flex-wrap gap-3 md:justify-end">
+            <div className="soft-ring rounded-[1.3rem] bg-white/72 px-4 py-3 text-center">
+              <p className="text-[0.72rem] font-semibold uppercase tracking-[0.22em] text-stone-500">
+                {language === "fr" ? "Avis publies" : "Published reviews"}
+              </p>
+              <p className="font-heading mt-2 text-3xl font-semibold text-[var(--accent-dark)]">
+                {reviews.length}
+              </p>
             </div>
-            <p className="mt-5 text-sm leading-7 text-stone-100">
-              {language === "fr"
-                ? "Les avis importes d'Airbnb et les messages directs peuvent cohabiter ici pour une page plus riche, sincere et personnelle."
-                : "Imported Airbnb reviews and direct guest notes can live together here so the page feels full, honest, and personal."}
-            </p>
+            <div className="soft-ring rounded-[1.3rem] bg-white/72 px-4 py-3 text-center">
+              <p className="text-[0.72rem] font-semibold uppercase tracking-[0.22em] text-stone-500">
+                {language === "fr" ? "Note moyenne" : "Average rating"}
+              </p>
+              <p className="font-heading mt-2 text-3xl font-semibold text-[var(--accent-dark)]">
+                {averageRating}
+              </p>
+            </div>
             {importHref ? (
               <Link
                 href={importHref}
-                className="mt-5 inline-block text-sm font-semibold text-[#f7e7cd] transition hover:text-white"
+                className="inline-flex items-center rounded-full border border-[var(--line)] bg-white/72 px-4 py-3 text-sm font-semibold text-[var(--accent-dark)] transition hover:bg-white"
               >
                 {language === "fr" ? "Outil d'import proprietaire" : "Owner import tool"}
               </Link>
             ) : null}
           </div>
         </div>
+
+        <form onSubmit={handleSubmit} className="mt-6 space-y-4">
+          <input type="text" name="website" className="hidden" tabIndex={-1} />
+          <input type="hidden" name="rating" value={selectedRating} />
+
+          <div className="grid gap-4 md:grid-cols-2">
+            <div>
+              <label className="mb-2 block text-sm font-semibold text-stone-700">
+                {language === "fr" ? "Nom" : "Name"}
+              </label>
+              <input
+                name="reviewerName"
+                placeholder={language === "fr" ? "Optionnel" : "Optional"}
+                className="w-full rounded-[1.2rem] border border-[var(--line)] bg-white px-4 py-3"
+              />
+            </div>
+            <div>
+              <label className="mb-2 block text-sm font-semibold text-stone-700">
+                {language === "fr" ? "Lieu" : "Location"}
+              </label>
+              <input
+                name="reviewerLocation"
+                placeholder={language === "fr" ? "Optionnel" : "Optional"}
+                className="w-full rounded-[1.2rem] border border-[var(--line)] bg-white px-4 py-3"
+              />
+            </div>
+          </div>
+
+          <div className="grid gap-4 md:grid-cols-2">
+            <div>
+              <label className="mb-2 block text-sm font-semibold text-stone-700">
+                {language === "fr" ? "Chalet" : "Cabin"}
+              </label>
+              <select
+                name="cabinId"
+                className="w-full rounded-[1.2rem] border border-[var(--line)] bg-white px-4 py-3"
+                defaultValue=""
+              >
+                <option value="">
+                  {language === "fr" ? "Experience generale" : "General experience"}
+                </option>
+                {cabins.map((cabin) => (
+                  <option key={cabin.id} value={cabin.id}>
+                    {cabin.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div>
+              <label className="mb-2 block text-sm font-semibold text-stone-700">
+                {language === "fr" ? "Note en etoiles" : "Star rating"}
+              </label>
+              <div className="flex items-center gap-2 rounded-[1.2rem] border border-[var(--line)] bg-white px-4 py-3">
+                {Array.from({ length: 5 }, (_, index) => {
+                  const starValue = index + 1;
+
+                  return (
+                    <button
+                      key={starValue}
+                      type="button"
+                      onClick={() => setSelectedRating(starValue)}
+                      className="text-2xl leading-none transition hover:scale-110"
+                      aria-label={
+                        language === "fr"
+                          ? `Choisir ${starValue} etoiles`
+                          : `Set ${starValue} star rating`
+                      }
+                    >
+                      <span
+                        className={
+                          starValue <= selectedRating
+                            ? "text-[#d89a31]"
+                            : "text-stone-300"
+                        }
+                      >
+                        {"\u2605"}
+                      </span>
+                    </button>
+                  );
+                })}
+                <span className="ml-2 text-sm font-semibold text-stone-600">
+                  {selectedRating}/5
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <div className="grid gap-4 md:grid-cols-2">
+            <div>
+              <label className="mb-2 block text-sm font-semibold text-stone-700">
+                {language === "fr" ? "Titre de l'avis" : "Review title"}
+              </label>
+              <input
+                name="title"
+                required
+                className="w-full rounded-[1.2rem] border border-[var(--line)] bg-white px-4 py-3"
+              />
+            </div>
+            <div>
+              <label className="mb-2 block text-sm font-semibold text-stone-700">
+                {language === "fr" ? "Repere du sejour" : "Stay label"}
+              </label>
+              <input
+                name="stayLabel"
+                placeholder={
+                  language === "fr" ? "Exemple : fevrier 2026" : "Example: February 2026"
+                }
+                className="w-full rounded-[1.2rem] border border-[var(--line)] bg-white px-4 py-3"
+              />
+            </div>
+          </div>
+
+          <div>
+            <label className="mb-2 block text-sm font-semibold text-stone-700">
+              {language === "fr" ? "Avis" : "Review"}
+            </label>
+            <textarea
+              name="body"
+              rows={7}
+              required
+              className="w-full rounded-[1.2rem] border border-[var(--line)] bg-white px-4 py-3"
+            />
+          </div>
+
+          <div>
+            <label className="mb-2 block text-sm font-semibold text-stone-700">
+              {language === "fr" ? "Photos du sejour" : "Stay photos"}
+            </label>
+            <div className="rounded-[1.2rem] border border-[var(--line)] bg-white px-4 py-4">
+              <input
+                type="file"
+                name="photos"
+                multiple
+                accept="image/*"
+                onChange={(event) =>
+                  setPhotoNames(
+                    Array.from(event.currentTarget.files ?? []).map((file) => file.name)
+                  )
+                }
+                className="w-full text-sm text-stone-700"
+              />
+              <p className="mt-2 text-xs leading-6 text-stone-500">
+                {language === "fr"
+                  ? "Optionnel. Jusqu'a 4 images, 5 Mo chacune."
+                  : "Optional. Up to 4 images, 5 MB each."}
+              </p>
+              {photoNames.length > 0 ? (
+                <div className="mt-3 flex flex-wrap gap-2">
+                  {photoNames.map((name) => (
+                    <span
+                      key={name}
+                      className="rounded-full bg-[rgba(86,112,71,0.12)] px-3 py-1 text-xs font-semibold text-[var(--accent-dark)]"
+                    >
+                      {name}
+                    </span>
+                  ))}
+                </div>
+              ) : null}
+            </div>
+          </div>
+
+          {error ? (
+            <div className="rounded-[1.2rem] border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-900">
+              {error}
+            </div>
+          ) : null}
+          {success ? (
+            <div className="rounded-[1.2rem] border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-900">
+              {success}
+            </div>
+          ) : null}
+
+          <button
+            disabled={isPending}
+            className="rounded-full bg-[var(--accent-dark)] px-6 py-3 font-semibold text-white transition hover:bg-[var(--accent)] disabled:cursor-not-allowed disabled:opacity-70"
+          >
+            {isPending
+              ? language === "fr"
+                ? "Enregistrement..."
+                : "Saving review..."
+              : language === "fr"
+                ? "Publier l'avis"
+                : "Publish review"}
+          </button>
+        </form>
       </section>
 
       <section className="panel rounded-[2rem] p-6 md:p-7">

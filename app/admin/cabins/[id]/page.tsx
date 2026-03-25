@@ -53,6 +53,7 @@ export default async function EditCabinPage({
             name: cabin.name,
             address: cabin.address,
             description: cabin.description,
+            descriptionFr: cabin.descriptionFr ?? "",
             price: cabin.price,
             guests: cabin.guests,
             bedrooms: cabin.bedrooms,

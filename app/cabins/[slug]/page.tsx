@@ -55,7 +55,10 @@ export default async function CabinDetailPage({
               {cabin.address}
             </p>
             <p className="mt-5 max-w-2xl text-base leading-7 text-stone-100 md:text-lg">
-              {cabin.description}
+              <LocalizedText
+                en={cabin.description}
+                fr={cabin.descriptionFr || cabin.description}
+              />
             </p>
           </div>
         </div>

@@ -12,6 +12,7 @@ model Cabin {
   slug        String   @unique
   address     String
   description String
+  descriptionFr String?
   price       String
   guests      Int
   bedrooms    Int

@@ -16,6 +16,7 @@ type CabinFormValues = {
   name: string;
   address: string;
   description: string;
+  descriptionFr: string;
   price: string;
   guests: number;
   bedrooms: number;
@@ -55,6 +56,7 @@ const defaultValues: CabinFormValues = {
   name: "",
   address: "",
   description: "",
+  descriptionFr: "",
   price: "",
   guests: 1,
   bedrooms: 1,
@@ -401,7 +403,32 @@ export default function CabinEditorForm({
           ) : null}
         </div>
 
-        <textarea name="description" required rows={5} defaultValue={values.description} placeholder="Describe the atmosphere, setting, and guest experience." className="w-full rounded-[1.2rem] border border-[var(--line)] bg-white px-4 py-3" />
+        <div className="grid gap-5">
+          <label className="block text-sm font-semibold text-stone-700">
+            English description
+            <textarea
+              name="description"
+              required
+              rows={5}
+              defaultValue={values.description}
+              placeholder="Describe the atmosphere, setting, and guest experience."
+              className="mt-2 w-full rounded-[1.2rem] border border-[var(--line)] bg-white px-4 py-3"
+            />
+          </label>
+          <label className="block text-sm font-semibold text-stone-700">
+            French description
+            <textarea
+              name="descriptionFr"
+              rows={5}
+              defaultValue={values.descriptionFr}
+              placeholder="Decrivez l'ambiance, le decor et l'experience du sejour en francais."
+              className="mt-2 w-full rounded-[1.2rem] border border-[var(--line)] bg-white px-4 py-3"
+            />
+            <p className="mt-2 text-sm font-normal leading-6 text-stone-500">
+              Optional. If left empty, the site will reuse the English description in French mode.
+            </p>
+          </label>
+        </div>
         <label className="block text-sm font-semibold text-stone-700">
           Price per night
           <div className="relative mt-2">

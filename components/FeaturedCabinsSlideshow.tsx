@@ -10,6 +10,7 @@ type FeaturedCabinSlide = {
   name: string;
   address: string;
   description: string;
+  descriptionFr?: string | null;
   guests: number;
   price: string;
   image: string;
@@ -68,7 +69,9 @@ export default function FeaturedCabinsSlideshow({
               {activeCabin.address}
             </p>
             <p className="mt-5 max-w-xl text-base leading-7 text-stone-100 md:text-lg">
-              {activeCabin.description}
+              {language === "fr"
+                ? activeCabin.descriptionFr || activeCabin.description
+                : activeCabin.description}
             </p>
 
             <div className="mt-6 flex flex-wrap gap-3 text-sm font-semibold text-[#f1ead9]">

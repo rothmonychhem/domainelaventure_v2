@@ -23,6 +23,7 @@ export async function POST(req: Request) {
   const address = String(formData.get("address") || "");
   const slug = buildCabinSlug({ name, address });
   const description = String(formData.get("description") || "");
+  const descriptionFr = String(formData.get("descriptionFr") || "").trim();
   const price = String(formData.get("price") || "");
   const guests = Number(formData.get("guests") || 0);
   const bedrooms = Number(formData.get("bedrooms") || 0);
@@ -44,6 +45,7 @@ export async function POST(req: Request) {
         slug,
         address,
         description,
+        descriptionFr: descriptionFr || null,
         price,
         guests,
         bedrooms,
