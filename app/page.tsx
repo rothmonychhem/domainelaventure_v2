@@ -1,6 +1,8 @@
 import Link from "next/link";
+import FeaturedCabinsSlideshow from "@/components/FeaturedCabinsSlideshow";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import SectionAccent from "@/components/SectionAccent";
 import { getAllCabins } from "@/lib/cabins";
 
 export const dynamic = "force-dynamic";
@@ -24,6 +26,16 @@ function getCabinCardImage(
 export default async function HomePage() {
   const cabins = await getAllCabins();
   const featuredCabins = cabins.slice(0, 3);
+  const featuredSlides = featuredCabins.map((cabin) => ({
+    id: cabin.id,
+    slug: cabin.slug,
+    name: cabin.name,
+    address: cabin.address,
+    description: cabin.description,
+    guests: cabin.guests,
+    price: cabin.price,
+    image: getCabinCardImage(cabin.images),
+  }));
 
   return (
     <main className="shell min-h-screen">
@@ -32,7 +44,7 @@ export default async function HomePage() {
       <section className="px-6 pb-12 pt-6 md:pb-16">
         <div className="mx-auto grid max-w-7xl gap-6 lg:grid-cols-[1.15fr_0.85fr]">
           <div
-            className="panel relative overflow-hidden rounded-[2rem] px-7 py-10 md:px-10 md:py-14"
+            className="panel relative min-h-[34rem] overflow-hidden rounded-[2rem] px-7 py-10 md:min-h-[42rem] md:px-10 md:py-14"
             style={{
               backgroundImage:
                 "linear-gradient(180deg, rgba(24, 18, 14, 0.24), rgba(24, 18, 14, 0.34)), url('https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1600&q=80')",
@@ -40,7 +52,7 @@ export default async function HomePage() {
               backgroundPosition: "center",
             }}
           >
-            <div className="relative max-w-2xl text-white">
+            <div className="relative flex h-full max-w-2xl flex-col justify-end text-white">
               <p className="eyebrow text-[#f8d7a7]">Forest calm, elevated</p>
               <h1 className="section-title mt-4 max-w-3xl text-white">
                 Cozy chalet stays with a warmer, more memorable brand presence.
@@ -68,13 +80,21 @@ export default async function HomePage() {
 
           <div className="grid gap-6">
             <div className="panel rounded-[2rem] p-7 md:p-8">
-              <p className="eyebrow">Why this setup works</p>
+              <SectionAccent icon="spark" label="Why this setup works" />
               <div className="mt-5 space-y-4">
                 {highlights.map((item) => (
                   <div
                     key={item}
-                    className="soft-ring rounded-[1.5rem] bg-white/70 px-4 py-4 text-sm leading-6 text-stone-700"
+                    className="soft-ring flex items-start gap-3 rounded-[1.5rem] bg-white/70 px-4 py-4 text-sm leading-6 text-stone-700"
                   >
+                    <span className="mt-0.5 inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[rgba(239,229,206,0.9)] text-[var(--accent-dark)]">
+                      <svg viewBox="0 0 24 24" className="h-4 w-4" aria-hidden="true">
+                        <path
+                          d="m12 4.3 1.5 4.2 4.2 1.5-4.2 1.5-1.5 4.2-1.5-4.2-4.2-1.5 4.2-1.5L12 4.3Z"
+                          fill="currentColor"
+                        />
+                      </svg>
+                    </span>
                     {item}
                   </div>
                 ))}
@@ -82,7 +102,7 @@ export default async function HomePage() {
             </div>
 
             <div className="panel rounded-[2rem] p-7 md:p-8">
-              <p className="eyebrow">Reservation flow</p>
+              <SectionAccent icon="mail" label="Reservation flow" />
               <div className="mt-4 space-y-4 text-sm leading-6 text-stone-700">
                 <p>
                   Guests choose a cabin, review the details page, and submit a
@@ -115,55 +135,29 @@ export default async function HomePage() {
             </Link>
           </div>
 
-          <div className="mt-10 grid gap-6 lg:grid-cols-3">
+          <div className="mt-10">
             {featuredCabins.length === 0 ? (
               <div className="panel rounded-[2rem] p-8 text-stone-700">
-                No cabins yet. Sign in from the footer to add your first chalet.
+                <div className="grid gap-6 md:grid-cols-[1fr_auto] md:items-center">
+                  <div>
+                    <p className="font-heading text-3xl font-semibold text-[var(--accent-dark)]">
+                      The first hero now carries the page.
+                    </p>
+                    <p className="mt-3 max-w-2xl text-sm leading-7 text-stone-700">
+                      No cabins are published yet, so this area stays quiet until
+                      you add one from the admin side.
+                    </p>
+                  </div>
+                  <Link
+                    href="/admin"
+                    className="rounded-full bg-[var(--accent-dark)] px-5 py-3 text-center text-sm font-semibold text-white transition hover:bg-[var(--accent)]"
+                  >
+                    Go to admin
+                  </Link>
+                </div>
               </div>
             ) : (
-              featuredCabins.map((cabin, index) => (
-                <article
-                  key={cabin.id}
-                  className="panel overflow-hidden rounded-[2rem] transition hover:-translate-y-1"
-                >
-                  <div
-                    className="h-72 bg-cover bg-center"
-                    style={{
-                      backgroundImage: `linear-gradient(180deg, rgba(39, 28, 22, 0.06), rgba(39, 28, 22, 0.2)), url('${getCabinCardImage(
-                        cabin.images
-                      )}')`,
-                    }}
-                  />
-                  <div className="space-y-4 p-7">
-                    <div className="flex items-center justify-between text-sm text-stone-500">
-                      <span>0{index + 1}</span>
-                      <span>Up to {cabin.guests} guests</span>
-                    </div>
-                    <div>
-                      <h3 className="font-heading text-3xl font-semibold text-[var(--accent-dark)]">
-                        {cabin.name}
-                      </h3>
-                      <p className="mt-2 text-sm font-medium text-stone-500">
-                        {cabin.address}
-                      </p>
-                      <p className="mt-3 line-clamp-3 text-sm leading-6 text-stone-700">
-                        {cabin.description}
-                      </p>
-                    </div>
-                    <div className="flex items-center justify-between gap-3">
-                      <p className="text-sm font-semibold text-[var(--pine)]">
-                        Starting from {cabin.price}
-                      </p>
-                      <Link
-                        href={`/cabins/${cabin.slug}`}
-                        className="rounded-full bg-[var(--accent-dark)] px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-[var(--accent)]"
-                      >
-                        View details
-                      </Link>
-                    </div>
-                  </div>
-                </article>
-              ))
+              <FeaturedCabinsSlideshow cabins={featuredSlides} />
             )}
           </div>
         </div>
@@ -186,6 +180,13 @@ export default async function HomePage() {
               If you want, we can next connect your real branding, add more cabin
               content, and plug in your notification credentials.
             </p>
+            <div className="pt-2">
+              <SectionAccent
+                icon="pine"
+                label="Simple setup, warm guest feel"
+                inverted
+              />
+            </div>
           </div>
         </div>
       </section>

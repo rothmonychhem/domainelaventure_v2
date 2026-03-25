@@ -32,6 +32,7 @@ model Cabin {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
   images      CabinImage[]
+  reviews     Review[]
 }
 
 model CabinImage {
@@ -54,4 +55,21 @@ model Reservation {
   endDate     String
   comments    String
   createdAt   DateTime @default(now())
+}
+
+model Review {
+  id               String   @id @default(cuid())
+  reviewerName     String
+  reviewerLocation String?
+  title            String
+  body             String
+  rating           Int
+  source           String   @default("direct")
+  stayLabel        String?
+  approved         Boolean  @default(true)
+  featured         Boolean  @default(false)
+  cabinId          String?
+  cabin            Cabin?   @relation(fields: [cabinId], references: [id], onDelete: SetNull)
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
 }

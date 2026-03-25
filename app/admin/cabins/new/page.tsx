@@ -13,7 +13,7 @@ export default async function NewCabinPage({
   const params = await searchParams;
 
   return (
-    <main className="min-h-screen bg-[#f6efe5] px-6 py-10">
+    <main className="shell min-h-screen px-6 py-10">
       <div className="mx-auto max-w-4xl rounded-[2rem] border border-[var(--line)] bg-white/82 p-8 shadow-[0_24px_60px_rgba(74,47,27,0.08)]">
         <p className="eyebrow">Admin</p>
         <Link
@@ -25,6 +25,10 @@ export default async function NewCabinPage({
         <h1 className="font-heading mt-3 text-4xl font-semibold text-[var(--accent-dark)]">
           Add a new cabin
         </h1>
+        <p className="mt-4 max-w-2xl text-sm leading-7 text-stone-700">
+          This editor now sits on the greener forest shell too, so the admin
+          side feels closer to the guest-facing brand.
+        </p>
         {params.error === "db" ? (
           <div className="mt-6 rounded-[1.2rem] border border-rose-200 bg-rose-50 px-4 py-4 text-sm leading-6 text-rose-900">
             The cabin could not be saved because the database connection is unavailable right now.
