@@ -4,8 +4,36 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { getCabinBySlug } from "@/lib/cabins";
 import { amenityOptions } from "@/lib/amenities";
+import { getPublishedReviewsForCabin } from "@/lib/reviews";
 
 export const dynamic = "force-dynamic";
+
+function renderStars(rating: number) {
+  return Array.from({ length: 5 }, (_, index) => (
+    <span key={index} className={index < rating ? "text-[#d89a31]" : "text-stone-300"}>
+      ★
+    </span>
+  ));
+}
+
+function getReviewAuthor(review: {
+  reviewerName: string;
+  reviewerLocation: string | null;
+  source: string;
+}) {
+  const baseName =
+    review.reviewerName && review.reviewerName !== "Anonymous"
+      ? review.reviewerName
+      : "Anonymous guest";
+
+  if (review.source === "airbnb") {
+    return baseName === "Anonymous guest"
+      ? "Review from Airbnb"
+      : `${baseName} from Airbnb`;
+  }
+
+  return baseName;
+}
 
 export default async function CabinDetailPage({
   params,
@@ -16,6 +44,8 @@ export default async function CabinDetailPage({
   const cabin = await getCabinBySlug(slug);
 
   if (!cabin) notFound();
+
+  const cabinReviews = await getPublishedReviewsForCabin(cabin.id);
 
   const heroImage =
     cabin.images.find((image) => image.isHero && image.mediaType === "image")?.url ||
@@ -132,6 +162,69 @@ export default async function CabinDetailPage({
                 ) : (
                   <div className="soft-ring rounded-[1.4rem] bg-white/70 p-5 text-sm leading-6 text-stone-600 sm:col-span-2">
                     Amenities have not been added for this chalet yet.
+                  </div>
+                )}
+              </div>
+            </div>
+
+            <div className="panel rounded-[2rem] p-7">
+              <div className="flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
+                <div>
+                  <p className="eyebrow">Guest reviews</p>
+                  <h2 className="font-heading mt-3 text-3xl font-semibold text-[var(--accent-dark)]">
+                    What guests say about {cabin.name}
+                  </h2>
+                </div>
+                <Link
+                  href="/reviews"
+                  className="text-sm font-semibold text-[var(--accent)] transition hover:text-[var(--accent-dark)]"
+                >
+                  View all reviews
+                </Link>
+              </div>
+              <div className="mt-6 space-y-4">
+                {cabinReviews.length > 0 ? (
+                  cabinReviews.slice(0, 3).map((review) => (
+                    <article
+                      key={review.id}
+                      className="soft-ring rounded-[1.5rem] bg-white/72 p-5"
+                    >
+                      <div className="flex flex-wrap items-start justify-between gap-4">
+                        <div>
+                          <div className="flex items-center gap-3">
+                            <p className="font-heading text-2xl font-semibold text-[var(--accent-dark)]">
+                              {review.title}
+                            </p>
+                            {review.source === "airbnb" ? (
+                              <span className="rounded-full bg-[rgba(86,112,71,0.12)] px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-[var(--accent-dark)]">
+                                From Airbnb
+                              </span>
+                            ) : null}
+                          </div>
+                          <p className="mt-2 text-sm font-medium text-stone-500">
+                            {getReviewAuthor(review)}
+                            {review.reviewerLocation
+                              ? `, ${review.reviewerLocation}`
+                              : ""}
+                          </p>
+                        </div>
+                        <div className="text-right">
+                          <div className="text-lg leading-none">
+                            {renderStars(review.rating)}
+                          </div>
+                          <p className="mt-2 text-xs font-semibold uppercase tracking-[0.2em] text-stone-500">
+                            {review.stayLabel || "Recent stay"}
+                          </p>
+                        </div>
+                      </div>
+                      <p className="mt-4 text-sm leading-7 text-stone-700">
+                        {review.body}
+                      </p>
+                    </article>
+                  ))
+                ) : (
+                  <div className="soft-ring rounded-[1.5rem] bg-white/72 p-5 text-sm leading-7 text-stone-700">
+                    No guest reviews have been added for this cabin yet.
                   </div>
                 )}
               </div>
